@@ -1,0 +1,189 @@
+@import "tailwindcss";
+
+@layer base {
+  :root, [data-theme="dark"] {
+    --bg-main: #0A0A0B;
+    --bg-surface: #111113;
+    --border-color: #27272A;
+    --text-primary: #F4F4F5;
+    --text-secondary: #A1A1AA;
+    --accent: #FF5A3C;
+    --accent-hover: #FF7A5C;
+  }
+
+  [data-theme="light"] {
+    --bg-main: #F8F9FA;
+    --bg-surface: #FFFFFF;
+    --border-color: #E4E4E7;
+    --text-primary: #09090B;
+    --text-secondary: #52525B;
+    --accent: #E0482B;
+    --accent-hover: #C83B20;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+    overflow-x: hidden;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  /* JetBrains / Geist Mono fallback for code & technical labels */
+  .font-mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'JetBrains Mono', 'Geist Mono', 'Liberation Mono', 'Courier New', monospace;
+  }
+}
+
+/* Light Theme Overrides */
+[data-theme="light"] {
+  color-scheme: light;
+
+  /* Global background override */
+  body, .bg-\[\#0A0A0B\] {
+    background-color: #F8F9FA !important;
+  }
+
+  .bg-\[\#0A0A0B\]\/90 {
+    background-color: rgba(248, 249, 250, 0.9) !important;
+  }
+
+  .bg-\[\#0A0A0B\]\/80 {
+    background-color: rgba(248, 249, 250, 0.8) !important;
+  }
+
+  .bg-\[\#0A0A0B\]\/60 {
+    background-color: rgba(248, 249, 250, 0.6) !important;
+  }
+
+  /* Card surface override */
+  .bg-\[\#111113\] {
+    background-color: #FFFFFF !important;
+  }
+
+  .bg-\[\#111113\]\/50 {
+    background-color: rgba(241, 243, 245, 0.7) !important;
+  }
+
+  .bg-\[\#111113\]\/60 {
+    background-color: rgba(241, 243, 245, 0.8) !important;
+  }
+
+  .bg-\[\#111113\]\/80 {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+  }
+
+  .bg-\[\#111113\]\/90 {
+    background-color: rgba(255, 255, 255, 0.9) !important;
+  }
+
+  .bg-\[\#161619\] {
+    background-color: #F4F4F5 !important;
+  }
+
+  .hover\:bg-\[\#161619\]:hover {
+    background-color: #F4F4F5 !important;
+  }
+
+  /* Secondary sub-card surface override */
+  .bg-\[\#0A0A0B\] {
+    background-color: #F1F3F5 !important;
+  }
+
+  /* Keep terminals & code blocks crisp dark for high contrast dev tool look */
+  .terminal-box, [data-terminal="true"] {
+    background-color: #09090B !important;
+    border-color: #27272A !important;
+    color: #F4F4F5 !important;
+  }
+
+  .terminal-box .text-\[\#F4F4F5\], [data-terminal="true"] .text-\[\#F4F4F5\] {
+    color: #F4F4F5 !important;
+  }
+
+  .terminal-box .text-\[\#A1A1AA\], [data-terminal="true"] .text-\[\#A1A1AA\] {
+    color: #A1A1AA !important;
+  }
+
+  .terminal-box .bg-\[\#111113\], [data-terminal="true"] .bg-\[\#111113\] {
+    background-color: #111113 !important;
+  }
+
+  .terminal-box .bg-\[\#0A0A0B\], [data-terminal="true"] .bg-\[\#0A0A0B\] {
+    background-color: #0A0A0B !important;
+  }
+
+  .terminal-box .border-\[\#27272A\], [data-terminal="true"] .border-\[\#27272A\] {
+    border-color: #27272A !important;
+  }
+
+  /* Borders */
+  .border-\[\#27272A\] {
+    border-color: #E4E4E7 !important;
+  }
+
+  /* Text colors */
+  .text-\[\#F4F4F5\] {
+    color: #09090B !important;
+  }
+
+  .text-\[\#A1A1AA\] {
+    color: #52525B !important;
+  }
+
+  .hover\:text-\[\#F4F4F5\]:hover {
+    color: #09090B !important;
+  }
+
+  /* Inputs & Selects */
+  input, select, textarea {
+    color: #09090B !important;
+    background-color: #FFFFFF !important;
+  }
+
+  input::placeholder {
+    color: #A1A1AA !important;
+  }
+
+  /* Hero grid pattern for light mode */
+  .bg-\[linear-gradient\(to_right\,\#111113_1px\,transparent_1px\)\,linear-gradient\(to_bottom\,\#111113_1px\,transparent_1px\)\] {
+    background-image: linear-gradient(to right, #E4E4E7 1px, transparent 1px), linear-gradient(to bottom, #E4E4E7 1px, transparent 1px) !important;
+  }
+}
+
+/* Custom dark scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3F3F46;
+}
+
+/* Cursor animation for terminal */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-blink {
+  animation: blink 1s infinite;
+}
+
+/* Subtle glow for coral CTA focus rings */
+.ring-coral {
+  box-shadow: 0 0 0 2px rgba(255, 90, 60, 0.4);
+}
