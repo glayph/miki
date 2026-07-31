@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Activity, Server, Cpu, Database, RefreshCw, Zap, ShieldCheck } from 'lucide-react';
 import { SystemHealth } from '../types';
+import { getSystemHealth } from '../services/mikiEngine';
 
 export const TelemetryStatus: React.FC = () => {
   const [health, setHealth] = useState<SystemHealth | null>(null);
   const [loading, setLoading] = useState(true);
   const [pinging, setPinging] = useState(false);
 
-  const fetchHealth = async () => {
+  const fetchHealth = () => {
     setPinging(true);
     try {
-      const res = await fetch('/api/agents/status');
-      if (res.ok) {
-        const data: SystemHealth = await res.json();
-        setHealth(data);
-      }
+      const data = getSystemHealth();
+      setHealth(data);
     } catch (err) {
       console.error('Failed to fetch telemetry status', err);
     } finally {
@@ -49,7 +47,7 @@ export const TelemetryStatus: React.FC = () => {
             Framework Health Monitor
           </h2>
           <p className="text-[#A1A1AA] text-sm sm:text-base">
-            Live telemetry data polled directly from <code className="text-[#FF5A3C] font-mono">GET /api/agents/status</code>.
+            Live telemetry data evaluated directly in the client runtime.
           </p>
         </div>
 
@@ -119,7 +117,7 @@ export const TelemetryStatus: React.FC = () => {
           {/* Raw JSON Telemetry Inspector */}
           <div className="p-4 rounded bg-[#0A0A0B] border border-[#27272A]">
             <div className="text-xs font-mono font-bold text-[#A1A1AA] mb-2 flex items-center justify-between">
-              <span>RESPONSE PAYLOAD (GET /api/agents/status)</span>
+              <span>TELEMETRY PAYLOAD (getSystemHealth())</span>
               <span className="text-[10px] text-[#FF5A3C]">JSON STREAM</span>
             </div>
             <pre className="p-3 rounded bg-[#111113] border border-[#27272A] text-xs font-mono text-[#F4F4F5] overflow-x-auto">

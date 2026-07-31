@@ -1,14 +1,15 @@
 import React from 'react';
 import { Github, Terminal, Sun, Moon } from 'lucide-react';
+import { navigate } from '../utils/router';
 
 interface FooterProps {
-  onNavClick: (id: string) => void;
-  onOpenDocs: () => void;
+  onNavClick?: (id: string) => void;
+  onOpenDocs?: () => void;
   theme?: 'dark' | 'light';
   onToggleTheme?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onNavClick, onOpenDocs, theme, onToggleTheme }) => {
+export const Footer: React.FC<FooterProps> = ({ theme, onToggleTheme }) => {
   return (
     <footer className="bg-[#0A0A0B] border-t border-[#27272A] py-16 text-xs font-mono">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -20,10 +21,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavClick, onOpenDocs, theme, o
           <div>
             <div className="text-[#FF5A3C] font-bold mb-4 uppercase tracking-wider">PRODUCT</div>
             <ul className="space-y-2.5 text-[#A1A1AA]">
-              <li><button onClick={() => onNavClick('features')} className="hover:text-[#F4F4F5]">Features Grid</button></li>
-              <li><button onClick={() => onNavClick('architecture')} className="hover:text-[#F4F4F5]">ReAct Architecture</button></li>
-              <li><button onClick={() => onNavClick('skills')} className="hover:text-[#F4F4F5]">Skill Marketplace</button></li>
-              <li><button onClick={() => onNavClick('pricing')} className="hover:text-[#F4F4F5]">Pricing Tiers</button></li>
+              <li><button onClick={() => navigate('/features')} className="hover:text-[#F4F4F5]">Features Grid</button></li>
+              <li><button onClick={() => navigate('/architecture/react')} className="hover:text-[#F4F4F5]">ReAct Architecture</button></li>
+              <li><button onClick={() => navigate('/marketplace')} className="hover:text-[#F4F4F5]">Skill Marketplace</button></li>
             </ul>
           </div>
 
@@ -31,10 +31,9 @@ export const Footer: React.FC<FooterProps> = ({ onNavClick, onOpenDocs, theme, o
           <div>
             <div className="text-[#FF5A3C] font-bold mb-4 uppercase tracking-wider">RESOURCES</div>
             <ul className="space-y-2.5 text-[#A1A1AA]">
-              <li><button onClick={onOpenDocs} className="hover:text-[#F4F4F5]">Documentation</button></li>
-              <li><button onClick={() => onNavClick('apikeys')} className="hover:text-[#F4F4F5]">API Key Studio</button></li>
-              <li><button onClick={() => onNavClick('telemetry')} className="hover:text-[#F4F4F5]">System Telemetry</button></li>
-              <li><a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#F4F4F5]">GitHub Repository</a></li>
+              <li><button onClick={() => navigate('/docs')} className="hover:text-[#F4F4F5]">Documentation Hub</button></li>
+              <li><button onClick={() => navigate('/telemetry')} className="hover:text-[#F4F4F5]">System Telemetry</button></li>
+              <li><a href="https://github.com/glayph/agent" target="_blank" rel="noopener noreferrer" className="hover:text-[#F4F4F5]">GitHub Repository</a></li>
             </ul>
           </div>
 
@@ -42,10 +41,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavClick, onOpenDocs, theme, o
           <div>
             <div className="text-[#FF5A3C] font-bold mb-4 uppercase tracking-wider">ECOSYSTEM</div>
             <ul className="space-y-2.5 text-[#A1A1AA]">
-              <li><span className="text-[#F4F4F5]">OpenClaw Skill Adapter</span></li>
-              <li><span className="text-[#F4F4F5]">Hermes Agent Bridge</span></li>
-              <li><span className="text-[#F4F4F5]">SQLite Memory Driver</span></li>
-              <li><span className="text-[#F4F4F5]">Playwright Chromium Tool</span></li>
+              <li><button onClick={() => navigate('/ecosystem/openclaw')} className="hover:text-[#F4F4F5] text-left">OpenClaw Skill Adapter</button></li>
+              <li><button onClick={() => navigate('/ecosystem/hermes')} className="hover:text-[#F4F4F5] text-left">Hermes Agent Bridge</button></li>
+              <li><button onClick={() => navigate('/ecosystem/sqlite-memory')} className="hover:text-[#F4F4F5] text-left">SQLite Memory Driver</button></li>
+              <li><button onClick={() => navigate('/ecosystem/playwright')} className="hover:text-[#F4F4F5] text-left">Playwright Chromium Tool</button></li>
             </ul>
           </div>
 
@@ -53,10 +52,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavClick, onOpenDocs, theme, o
           <div>
             <div className="text-[#FF5A3C] font-bold mb-4 uppercase tracking-wider">LEGAL & LICENSE</div>
             <ul className="space-y-2.5 text-[#A1A1AA]">
-              <li><span>MIT Open Source License</span></li>
-              <li><span>Privacy Policy</span></li>
-              <li><span>Terms of Service</span></li>
-              <li><span>SOC2 Type II Ready</span></li>
+              <li><button onClick={() => navigate('/legal/license')} className="hover:text-[#F4F4F5] text-left">MIT Open Source License</button></li>
+              <li><button onClick={() => navigate('/legal/privacy')} className="hover:text-[#F4F4F5] text-left">Privacy Policy</button></li>
+              <li><button onClick={() => navigate('/legal/terms')} className="hover:text-[#F4F4F5] text-left">Terms of Service</button></li>
+              <li><button onClick={() => navigate('/legal/soc2')} className="hover:text-[#F4F4F5] text-left">SOC2 Type II Ready</button></li>
             </ul>
           </div>
 
@@ -64,7 +63,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavClick, onOpenDocs, theme, o
 
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-[#27272A] flex flex-col sm:flex-row items-center justify-between gap-4 text-[#A1A1AA]">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
             <div className="font-mono font-black text-sm tracking-tighter text-[#F4F4F5] flex items-center">
               <span className="text-[#FF5A3C]">{'{'}</span>MIKI<span className="text-[#FF5A3C]">{'}'}</span>
             </div>

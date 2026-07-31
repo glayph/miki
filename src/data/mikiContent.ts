@@ -1,4 +1,4 @@
-import { SkillItem, PricingPlan } from '../types';
+import { SkillItem } from '../types';
 
 export const INITIAL_SKILLS: SkillItem[] = [
   {
@@ -107,60 +107,6 @@ agent.enableAutoAcquisition({
   registryUrl: "https://registry.miki.dev/v1",
   autoApproveFree: true
 });`
-  }
-];
-
-export const PRICING_PLANS: PricingPlan[] = [
-  {
-    id: 'community',
-    name: 'Community',
-    description: 'Open-source self-hosted framework for developers and local agent experimentations.',
-    price: '$0',
-    period: 'forever free',
-    features: [
-      'Self-hosted Core CLI & NPM packages',
-      'Unlimited local ReAct orchestration',
-      'SQLite layered memory driver',
-      'Playwright browser automation driver',
-      'OpenClaw & Hermes skill compatibility',
-      'Community Discord & GitHub support'
-    ],
-    ctaText: 'Clone on GitHub'
-  },
-  {
-    id: 'pro',
-    name: 'Pro Cloud / Team',
-    description: 'Managed agent runtime, telemetry dashboard, auto-scaling and hosted skill registry.',
-    price: '$29',
-    period: 'per seat / month',
-    highlighted: true,
-    badge: 'MOST POPULAR',
-    features: [
-      'Everything in Community',
-      'Hosted Cloud Runtime on global edge',
-      'Managed SQLite + Vector sync clusters',
-      'Private Skill Registry & hot-reloading',
-      'WebSockets streaming agent state',
-      'Dedicated API Key management & RBAC',
-      'Priority 24/7 technical support'
-    ],
-    ctaText: 'Start 14-Day Free Trial'
-  },
-  {
-    id: 'enterprise',
-    name: 'Enterprise',
-    description: 'Custom deployment (VPC / On-Premise), SLA guarantees, and enterprise security compliance.',
-    price: 'Custom',
-    period: 'tailored plans',
-    features: [
-      'Dedicated Isolated VPC / Air-gapped runtime',
-      'Unlimited multi-tenant agent instances',
-      'Custom LLM providers & local fine-tuned models',
-      'SOC2 Type II, HIPAA & ISO 27001 readiness',
-      'Custom skill bridge engineering support',
-      'Guaranteed 99.99% uptime SLA'
-    ],
-    ctaText: 'Contact Enterprise Team'
   }
 ];
 

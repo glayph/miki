@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Filter, Download, Check, Link, Puzzle, Cpu, Database, Globe, Workflow, Code, Sparkles, RefreshCw } from 'lucide-react';
 import { SkillItem } from '../types';
+import { getSkillsMarketplace, toggleSkillInstall } from '../services/mikiEngine';
 
 export const SkillMarketplace: React.FC = () => {
   const [skills, setSkills] = useState<SkillItem[]>([]);
@@ -10,15 +11,12 @@ export const SkillMarketplace: React.FC = () => {
   const [selectedSkill, setSelectedSkill] = useState<SkillItem | null>(null);
   const [installingId, setInstallingId] = useState<string | null>(null);
 
-  const fetchSkills = async () => {
+  const fetchSkills = () => {
     try {
-      const res = await fetch('/api/skills/marketplace');
-      if (res.ok) {
-        const data = await res.json();
-        setSkills(data);
-        if (data.length > 0 && !selectedSkill) {
-          setSelectedSkill(data[0]);
-        }
+      const data = getSkillsMarketplace();
+      setSkills(data);
+      if (data.length > 0 && !selectedSkill) {
+        setSelectedSkill(data[0]);
       }
     } catch (err) {
       console.error('Failed to fetch skills marketplace', err);
@@ -31,28 +29,17 @@ export const SkillMarketplace: React.FC = () => {
     fetchSkills();
   }, []);
 
-  const handleToggleInstall = async (skill: SkillItem) => {
+  const handleToggleInstall = (skill: SkillItem) => {
     setInstallingId(skill.id);
-    const newInstallState = !skill.installed;
+    const updated = toggleSkillInstall(skill.id);
 
-    try {
-      const res = await fetch('/api/skills/install', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ skillId: skill.id, install: newInstallState })
-      });
-
-      if (res.ok) {
-        setSkills(prev => prev.map(s => s.id === skill.id ? { ...s, installed: newInstallState } : s));
-        if (selectedSkill?.id === skill.id) {
-          setSelectedSkill(prev => prev ? { ...prev, installed: newInstallState } : null);
-        }
+    if (updated) {
+      setSkills(prev => prev.map(s => s.id === skill.id ? updated : s));
+      if (selectedSkill?.id === skill.id) {
+        setSelectedSkill(updated);
       }
-    } catch (err) {
-      console.error('Failed to toggle install state', err);
-    } finally {
-      setInstallingId(null);
     }
+    setInstallingId(null);
   };
 
   const filteredSkills = skills.filter(skill => {
@@ -77,7 +64,7 @@ export const SkillMarketplace: React.FC = () => {
         
         {/* Section Header */}
         <div className="text-center max-w-2xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#111113] border border-[#27272A] text-xs font-mono font-bold tracking-widest text-[#FF5A3C] uppercase mb-4">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-none bg-[#111113] border border-[#27272A] text-xs font-mono font-bold tracking-widest text-[#FF5A3C] uppercase mb-4">
             Universal Skill Ecosystem
           </div>
           <h2 className="text-3xl sm:text-4xl font-black text-[#F4F4F5] uppercase tracking-tight mb-4">
@@ -99,7 +86,7 @@ export const SkillMarketplace: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search skills, drivers, bridges..."
-              className="w-full bg-[#111113] border border-[#27272A] focus:border-[#FF5A3C] rounded-lg pl-9 pr-4 py-2 text-xs font-mono text-[#F4F4F5] focus:outline-none"
+              className="w-full bg-[#111113] border border-[#27272A] focus:border-[#FF5A3C] rounded-none pl-9 pr-4 py-2 text-xs font-mono text-[#F4F4F5] focus:outline-none"
             />
           </div>
 
@@ -107,7 +94,7 @@ export const SkillMarketplace: React.FC = () => {
           <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
             <button
               onClick={() => setSelectedFilter('all')}
-              className={`px-3 py-1.5 text-xs font-mono rounded-md border transition-all ${
+              className={`px-3 py-1.5 text-xs font-mono rounded-none border transition-all ${
                 selectedFilter === 'all'
                   ? 'bg-[#FF5A3C] text-white border-[#FF5A3C]'
                   : 'bg-[#111113] text-[#A1A1AA] border-[#27272A] hover:text-[#F4F4F5]'
@@ -118,7 +105,7 @@ export const SkillMarketplace: React.FC = () => {
 
             <button
               onClick={() => setSelectedFilter('openclaw')}
-              className={`px-3 py-1.5 text-xs font-mono rounded-md border transition-all flex items-center gap-1 ${
+              className={`px-3 py-1.5 text-xs font-mono rounded-none border transition-all flex items-center gap-1 ${
                 selectedFilter === 'openclaw'
                   ? 'bg-[#FF5A3C] text-white border-[#FF5A3C]'
                   : 'bg-[#111113] text-[#A1A1AA] border-[#27272A] hover:text-[#F4F4F5]'
@@ -130,7 +117,7 @@ export const SkillMarketplace: React.FC = () => {
 
             <button
               onClick={() => setSelectedFilter('hermes')}
-              className={`px-3 py-1.5 text-xs font-mono rounded-md border transition-all flex items-center gap-1 ${
+              className={`px-3 py-1.5 text-xs font-mono rounded-none border transition-all flex items-center gap-1 ${
                 selectedFilter === 'hermes'
                   ? 'bg-[#FF5A3C] text-white border-[#FF5A3C]'
                   : 'bg-[#111113] text-[#A1A1AA] border-[#27272A] hover:text-[#F4F4F5]'
@@ -149,11 +136,11 @@ export const SkillMarketplace: React.FC = () => {
           {/* Skill List Column */}
           <div className="lg:col-span-7 space-y-4">
             {loading ? (
-              <div className="p-8 text-center text-xs font-mono text-[#A1A1AA] bg-[#111113] rounded-lg border border-[#27272A]">
+              <div className="p-8 text-center text-xs font-mono text-[#A1A1AA] bg-[#111113] rounded-none border border-[#27272A]">
                 Loading Skill Catalog...
               </div>
             ) : filteredSkills.length === 0 ? (
-              <div className="p-8 text-center text-xs font-mono text-[#A1A1AA] bg-[#111113] rounded-lg border border-[#27272A]">
+              <div className="p-8 text-center text-xs font-mono text-[#A1A1AA] bg-[#111113] rounded-none border border-[#27272A]">
                 No skills matched search criteria.
               </div>
             ) : (
@@ -165,7 +152,7 @@ export const SkillMarketplace: React.FC = () => {
                   <div
                     key={skill.id}
                     onClick={() => setSelectedSkill(skill)}
-                    className={`p-5 rounded-lg border transition-all cursor-pointer ${
+                    className={`p-5 rounded-none border transition-all cursor-pointer ${
                       isSelected
                         ? 'bg-[#111113] border-[#FF5A3C]'
                         : 'bg-[#111113]/60 border-[#27272A] hover:border-[#A1A1AA]/40'
@@ -177,7 +164,7 @@ export const SkillMarketplace: React.FC = () => {
                           <h3 className="text-base font-bold text-[#F4F4F5] group-hover:text-[#FF5A3C]">
                             {skill.name}
                           </h3>
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#0A0A0B] border border-[#27272A] text-[#A1A1AA]">
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-none bg-[#0A0A0B] border border-[#27272A] text-[#A1A1AA]">
                             v{skill.version}
                           </span>
                         </div>
@@ -193,7 +180,7 @@ export const SkillMarketplace: React.FC = () => {
                           handleToggleInstall(skill);
                         }}
                         disabled={isInstalling}
-                        className={`px-3 py-1.5 text-xs font-mono rounded-md border flex items-center gap-1.5 shrink-0 transition-all ${
+                        className={`px-3 py-1.5 text-xs font-mono rounded-none border flex items-center gap-1.5 shrink-0 transition-all ${
                           skill.installed
                             ? 'bg-emerald-950/40 border-emerald-700 text-emerald-400 hover:bg-red-950/40 hover:border-red-800 hover:text-red-300'
                             : 'bg-[#FF5A3C] border-[#FF5A3C] text-white hover:bg-[#FF7A5C]'
@@ -223,7 +210,7 @@ export const SkillMarketplace: React.FC = () => {
                       <span>•</span>
                       <div className="flex gap-1">
                         {skill.compatibility.map((c, i) => (
-                          <span key={i} className="px-1.5 py-0.5 rounded bg-[#0A0A0B] border border-[#27272A] text-[10px]">
+                          <span key={i} className="px-1.5 py-0.5 rounded-none bg-[#0A0A0B] border border-[#27272A] text-[10px]">
                             {c}
                           </span>
                         ))}
@@ -237,7 +224,7 @@ export const SkillMarketplace: React.FC = () => {
           </div>
 
           {/* Skill Code Inspector */}
-          <div className="lg:col-span-5 p-6 rounded-lg bg-[#111113] border border-[#27272A] sticky top-24 font-mono">
+          <div className="lg:col-span-5 p-6 rounded-none bg-[#111113] border border-[#27272A] sticky top-24 font-mono">
             {selectedSkill ? (
               <div>
                 <div className="flex items-center justify-between pb-4 border-b border-[#27272A] mb-4">
@@ -247,7 +234,7 @@ export const SkillMarketplace: React.FC = () => {
                     </span>
                     <h3 className="text-lg font-bold text-[#F4F4F5]">{selectedSkill.name}</h3>
                   </div>
-                  <span className={`px-2 py-1 rounded text-xs ${
+                  <span className={`px-2 py-1 rounded-none text-xs ${
                     selectedSkill.installed ? 'bg-emerald-950/60 border border-emerald-700 text-emerald-400' : 'bg-[#0A0A0B] border border-[#27272A] text-[#A1A1AA]'
                   }`}>
                     {selectedSkill.installed ? 'ACTIVE IN RUNTIME' : 'NOT INSTALLED'}
@@ -263,12 +250,12 @@ export const SkillMarketplace: React.FC = () => {
                     <span>PLUGIN INTERFACE SNIPPET:</span>
                     <span className="text-[#A1A1AA] text-[10px]">ISkillPlugin v1.4</span>
                   </div>
-                  <pre className="p-3 rounded bg-[#0A0A0B] border border-[#27272A] text-xs text-[#F4F4F5] overflow-x-auto leading-relaxed">
+                  <pre className="p-3 rounded-none bg-[#0A0A0B] border border-[#27272A] text-xs text-[#F4F4F5] overflow-x-auto leading-relaxed">
                     <code>{selectedSkill.codeSnippet}</code>
                   </pre>
                 </div>
 
-                <div className="p-3 rounded bg-[#0A0A0B] border border-[#27272A] text-xs text-[#A1A1AA] space-y-1">
+                <div className="p-3 rounded-none bg-[#0A0A0B] border border-[#27272A] text-xs text-[#A1A1AA] space-y-1">
                   <div className="text-[#FF5A3C] font-bold">ECOSYSTEM COMPATIBILITY:</div>
                   <div>• OpenClaw JSON Schema Mapper: OK</div>
                   <div>• Hermes Tool Function Call Protocol: OK</div>

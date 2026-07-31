@@ -1,49 +1,56 @@
 import React, { useState } from 'react';
-import { Github, Terminal, Key, Cpu, Menu, X, Layers, ShieldAlert, Sparkles, Sun, Moon } from 'lucide-react';
+import { Github, Menu, X, Sparkles, Sun, Moon, ChevronDown } from 'lucide-react';
+import { navigate, usePathname } from '../utils/router';
 
 interface NavbarProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-  onOpenDocs: () => void;
-  theme: 'dark' | 'light';
-  onToggleTheme: () => void;
+  activeTab?: string;
+  setActiveTab?: (tab: string) => void;
+  onOpenDocs?: () => void;
+  theme?: 'dark' | 'light';
+  onToggleTheme?: () => void;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenDocs, theme, onToggleTheme }) => {
+export const Navbar: React.FC<NavbarProps> = ({ theme, onToggleTheme }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const pathname = usePathname();
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navItems = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'features', label: 'Features' },
-    { id: 'architecture', label: 'Architecture' },
-    { id: 'skills', label: 'Skills & Ecosystem' },
-    { id: 'apikeys', label: 'API Keys' },
-    { id: 'telemetry', label: 'Status' },
-    { id: 'pricing', label: 'Pricing' },
+    { path: '/', label: 'Overview' },
+    { path: '/features', label: 'Features' },
+    { path: '/architecture/react', label: 'Architecture' },
+    { path: '/marketplace', label: 'Skills & Ecosystem' },
+    { path: '/telemetry', label: 'Status' },
   ];
 
-  const handleNavClick = (id: string) => {
-    setActiveTab(id);
+  const handleNavClick = (path: string) => {
     setMobileMenuOpen(false);
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+    navigate(path);
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-[#0A0A0B]/90 backdrop-blur-md border-b border-[#27272A]">
+    <header className={`sticky top-0 z-50 bg-[#0A0A0B]/90 backdrop-blur-md border-b transition-all duration-200 ${
+      scrolled ? 'border-[#FF5A3C]/30 shadow-xl shadow-black/20' : 'border-[#27272A]'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         
         {/* Brand Logo */}
         <button 
-          onClick={() => handleNavClick('overview')} 
+          onClick={() => handleNavClick('/')} 
           className="flex items-center gap-2 text-left group focus:outline-none"
         >
           <div className="font-mono font-black text-xl tracking-tighter text-[#F4F4F5] flex items-center">
             <span className="text-[#FF5A3C]">{'{'}</span>MIKI<span className="text-[#FF5A3C]">{'}'}</span>
           </div>
-          <span className="text-[10px] font-mono uppercase tracking-widest px-1.5 py-0.5 rounded bg-[#111113] border border-[#27272A] text-[#A1A1AA]">
+          <span className="text-[10px] font-mono uppercase tracking-widest px-1.5 py-0.5 rounded-none bg-[#111113] border border-[#27272A] text-[#A1A1AA]">
             v1.4.2
           </span>
         </button>
@@ -51,12 +58,12 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenD
         {/* Desktop Nav Links */}
         <nav className="hidden md:flex items-center gap-1">
           {navItems.map((item) => {
-            const isActive = activeTab === item.id;
+            const isActive = pathname === item.path || (item.path !== '/' && pathname.startsWith(item.path));
             return (
               <button
-                key={item.id}
-                onClick={() => handleNavClick(item.id)}
-                className={`px-3 py-1.5 text-xs font-mono rounded-md transition-all ${
+                key={item.path}
+                onClick={() => handleNavClick(item.path)}
+                className={`px-3 py-1.5 text-xs font-mono rounded-none transition-all ${
                   isActive
                     ? 'text-[#FF5A3C] bg-[#111113] border border-[#FF5A3C]/40 font-semibold'
                     : 'text-[#A1A1AA] hover:text-[#F4F4F5] hover:bg-[#111113]'
@@ -71,40 +78,46 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenD
         {/* Right Action Buttons */}
         <div className="hidden md:flex items-center gap-3">
           <button
-            onClick={onOpenDocs}
-            className="px-3 py-1.5 text-xs font-mono text-[#A1A1AA] hover:text-[#F4F4F5] hover:bg-[#111113] rounded-md border border-transparent hover:border-[#27272A] transition-colors"
+            onClick={() => handleNavClick('/docs')}
+            className={`px-3 py-1.5 text-xs font-mono rounded-none border transition-colors ${
+              pathname === '/docs'
+                ? 'text-[#FF5A3C] bg-[#111113] border-[#FF5A3C]/40'
+                : 'text-[#A1A1AA] hover:text-[#F4F4F5] hover:bg-[#111113] border-transparent hover:border-[#27272A]'
+            }`}
           >
             Docs
           </button>
 
           <a
-            href="https://github.com"
+            href="https://github.com/glayph/agent"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-1.5 text-[#A1A1AA] hover:text-[#F4F4F5] hover:bg-[#111113] border border-[#27272A] rounded-md transition-colors"
+            className="p-1.5 text-[#A1A1AA] hover:text-[#F4F4F5] hover:bg-[#111113] border border-[#27272A] rounded-none transition-colors"
             title="GitHub Repository"
           >
             <Github className="w-4 h-4" />
           </a>
 
-          <button
-            onClick={onToggleTheme}
-            className="p-1.5 text-[#A1A1AA] hover:text-[#F4F4F5] hover:bg-[#111113] border border-[#27272A] rounded-md transition-colors flex items-center justify-center"
-            title={theme === 'dark' ? "Switch to Light Theme" : "Switch to Dark Theme"}
-            aria-label="Toggle theme"
-          >
-            {theme === 'dark' ? (
-              <Sun className="w-4 h-4 text-[#FF5A3C]" />
-            ) : (
-              <Moon className="w-4 h-4 text-[#FF5A3C]" />
-            )}
-          </button>
+          {onToggleTheme && (
+            <button
+              onClick={onToggleTheme}
+              className="p-1.5 text-[#A1A1AA] hover:text-[#F4F4F5] hover:bg-[#111113] border border-[#27272A] rounded-none transition-colors flex items-center justify-center"
+              title={theme === 'dark' ? "Switch to Light Theme" : "Switch to Dark Theme"}
+              aria-label="Toggle theme"
+            >
+              {theme === 'dark' ? (
+                <Sun className="w-4 h-4 text-[#FF5A3C]" />
+              ) : (
+                <Moon className="w-4 h-4 text-[#FF5A3C]" />
+              )}
+            </button>
+          )}
 
           <button
-            onClick={() => handleNavClick('apikeys')}
-            className="px-4 py-1.5 text-xs font-mono font-medium text-white bg-[#FF5A3C] hover:bg-[#FF7A5C] rounded-lg transition-all shadow-sm flex items-center gap-1.5 focus:ring-2 focus:ring-[#FF5A3C]/50"
+            onClick={() => handleNavClick('/marketplace')}
+            className="px-4 py-1.5 text-xs font-mono font-medium text-white bg-[#FF5A3C] hover:bg-[#FF7A5C] rounded-none transition-all shadow-sm flex items-center gap-1.5 focus:ring-2 focus:ring-[#FF5A3C]/50"
           >
-            <Key className="w-3.5 h-3.5" />
+            <Sparkles className="w-3.5 h-3.5" />
             Get Started
           </button>
         </div>
@@ -112,7 +125,7 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenD
         {/* Mobile Menu Toggle */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden p-2 text-[#A1A1AA] hover:text-[#F4F4F5] border border-[#27272A] rounded-lg bg-[#111113]"
+          className="md:hidden p-2 text-[#A1A1AA] hover:text-[#F4F4F5] border border-[#27272A] rounded-none bg-[#111113]"
         >
           {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
@@ -123,32 +136,34 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, onOpenD
         <div className="md:hidden bg-[#0A0A0B] border-b border-[#27272A] px-4 py-4 space-y-2">
           {navItems.map((item) => (
             <button
-              key={item.id}
-              onClick={() => handleNavClick(item.id)}
-              className="w-full text-left px-3 py-2 text-sm font-mono rounded-md text-[#A1A1AA] hover:text-[#F4F4F5] hover:bg-[#111113]"
+              key={item.path}
+              onClick={() => handleNavClick(item.path)}
+              className="w-full text-left px-3 py-2 text-sm font-mono rounded-none text-[#A1A1AA] hover:text-[#F4F4F5] hover:bg-[#111113]"
             >
               {item.label}
             </button>
           ))}
           <div className="pt-2 border-t border-[#27272A] flex flex-col gap-2">
+            {onToggleTheme && (
+              <button
+                onClick={onToggleTheme}
+                className="w-full text-left px-3 py-2 text-sm font-mono text-[#A1A1AA] hover:text-[#F4F4F5] bg-[#111113] border border-[#27272A] rounded-none flex items-center justify-between"
+              >
+                <span>Theme: {theme === 'dark' ? 'Dark' : 'Light'}</span>
+                {theme === 'dark' ? <Sun className="w-4 h-4 text-[#FF5A3C]" /> : <Moon className="w-4 h-4 text-[#FF5A3C]" />}
+              </button>
+            )}
             <button
-              onClick={onToggleTheme}
-              className="w-full text-left px-3 py-2 text-sm font-mono text-[#A1A1AA] hover:text-[#F4F4F5] bg-[#111113] border border-[#27272A] rounded-md flex items-center justify-between"
-            >
-              <span>Theme: {theme === 'dark' ? 'Dark' : 'Light'}</span>
-              {theme === 'dark' ? <Sun className="w-4 h-4 text-[#FF5A3C]" /> : <Moon className="w-4 h-4 text-[#FF5A3C]" />}
-            </button>
-            <button
-              onClick={() => { onOpenDocs(); setMobileMenuOpen(false); }}
-              className="w-full text-center py-2 text-sm font-mono text-[#A1A1AA] bg-[#111113] border border-[#27272A] rounded-md"
+              onClick={() => handleNavClick('/docs')}
+              className="w-full text-center py-2 text-sm font-mono text-[#A1A1AA] bg-[#111113] border border-[#27272A] rounded-none"
             >
               Documentation
             </button>
             <button
-              onClick={() => handleNavClick('apikeys')}
-              className="w-full text-center py-2 text-sm font-mono font-medium text-white bg-[#FF5A3C] rounded-md"
+              onClick={() => handleNavClick('/marketplace')}
+              className="w-full text-center py-2 text-sm font-mono font-medium text-white bg-[#FF5A3C] rounded-none"
             >
-              Get Started / API Keys
+              Get Started / Skills
             </button>
           </div>
         </div>

@@ -57,7 +57,7 @@ export const ArchitectureDiagram: React.FC = () => {
         
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#111113] border border-[#27272A] text-xs font-mono font-bold tracking-widest text-[#FF5A3C] uppercase mb-4">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-none bg-[#111113] border border-[#27272A] text-xs font-mono font-bold tracking-widest text-[#FF5A3C] uppercase mb-4">
             System Architecture
           </div>
           <h2 className="text-3xl sm:text-4xl font-black text-[#F4F4F5] uppercase tracking-tight mb-4">
@@ -79,18 +79,18 @@ export const ArchitectureDiagram: React.FC = () => {
                 <button
                   key={node.id}
                   onClick={() => setSelectedNode(node.id)}
-                  className={`p-4 rounded-lg border text-left transition-all relative ${
+                  className={`p-4 rounded-none border text-left transition-all relative ${
                     isSelected
                       ? 'bg-[#111113] border-[#FF5A3C] ring-1 ring-[#FF5A3C]'
                       : 'bg-[#111113]/50 border-[#27272A] hover:border-[#A1A1AA]/40'
                   }`}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <div className="p-2 rounded bg-[#0A0A0B] border border-[#27272A]">
+                    <div className="p-2 rounded-none bg-[#0A0A0B] border border-[#27272A]">
                       {node.icon}
                     </div>
                     {isSelected && (
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#FF5A3C] text-white">
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-none bg-[#FF5A3C] text-white">
                         ACTIVE
                       </span>
                     )}
@@ -103,16 +103,16 @@ export const ArchitectureDiagram: React.FC = () => {
           </div>
 
           {/* Right Column: Node Inspector Panel */}
-          <div className="p-6 rounded-lg bg-[#111113] border border-[#27272A] font-mono">
+          <div className="p-6 rounded-none bg-[#111113] border border-[#27272A] font-mono">
             <div className="flex items-center gap-2 text-xs text-[#FF5A3C] mb-4 border-b border-[#27272A] pb-3">
-              <span className="w-2 h-2 rounded-full bg-[#FF5A3C] animate-ping" />
+              <span className="w-2 h-2 bg-[#FF5A3C] animate-ping" />
               LAYER INSPECTOR // {activeNodeData.id.toUpperCase()}
             </div>
 
             <h3 className="text-lg font-bold text-[#F4F4F5] mb-2">{activeNodeData.title}</h3>
             <p className="text-xs text-[#FF5A3C] mb-4">{activeNodeData.subtitle}</p>
 
-            <div className="p-3 rounded bg-[#0A0A0B] border border-[#27272A] text-xs text-[#A1A1AA] leading-relaxed mb-6">
+            <div className="p-3 rounded-none bg-[#0A0A0B] border border-[#27272A] text-xs text-[#A1A1AA] leading-relaxed mb-6">
               {activeNodeData.desc}
             </div>
 

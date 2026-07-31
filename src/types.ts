@@ -1,17 +1,3 @@
-export interface ApiKey {
-  id: string;
-  label: string;
-  keyPrefix: string;
-  createdAt: string;
-  lastUsedAt?: string;
-  revokedAt?: string;
-  status: 'active' | 'revoked';
-}
-
-export interface ApiKeyCreatedResponse extends ApiKey {
-  apiKey: string; // The raw secret key returned only once
-}
-
 export interface SystemHealth {
   status: 'operational' | 'degraded' | 'maintenance';
   version: string;
@@ -59,14 +45,4 @@ export interface AgentRunResponse {
   executionTimeMs: number;
 }
 
-export interface PricingPlan {
-  id: string;
-  name: string;
-  description: string;
-  price: string;
-  period: string;
-  badge?: string;
-  highlighted?: boolean;
-  features: string[];
-  ctaText: string;
-}
+
