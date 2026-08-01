@@ -10,47 +10,62 @@ export const DocsPage: React.FC = () => {
   const [activePath, setActivePath] = useState<string>('/docs/guides/quickstart.md');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  const docNavGroups = [
-    {
-      category: 'Guides',
-      items: [
-        { path: '/docs/guides/quickstart.md', label: 'Quickstart & Installation' },
-        { path: '/docs/guides/skills.md', label: 'Skill Plugin Development' }
-      ]
-    },
-    {
-      category: 'Architecture',
-      items: [
-        { path: '/docs/architecture/react.md', label: 'ReAct Orchestration Loop' }
-      ]
-    },
-    {
-      category: 'Ecosystem Specs',
-      items: [
-        { path: '/docs/ecosystem/hermes.md', label: 'Hermes Agent Bridge' },
-        { path: '/docs/ecosystem/openclaw.md', label: 'OpenClaw Skill Adapter' },
-        { path: '/docs/ecosystem/playwright.md', label: 'Playwright Chromium Tool' },
-        { path: '/docs/ecosystem/sqlite-memory.md', label: 'SQLite Layered Memory' }
-      ]
-    },
-    {
-      category: 'Legal & Compliance',
-      items: [
-        { path: '/docs/legal/privacy.md', label: 'Privacy & Data Guarantees' },
-        { path: '/docs/legal/terms.md', label: 'Terms & Usage SLA' },
-        { path: '/docs/legal/license.md', label: 'MIT Open Source License' },
-        { path: '/docs/legal/soc2.md', label: 'SOC2 Security Controls' }
-      ]
-    },
-    {
-      category: 'Release Logs',
-      items: [
-        { path: '/docs/changelog.md', label: 'Changelog & Version History' }
-      ]
-    }
-  ];
+  const allDocs = getAllDocs();
 
-  const currentDoc = getDocByPath(activePath) || getDocByPath('/docs/guides/quickstart.md');
+  // Custom labels map for clean sidebar display
+  const labelMap: Record<string, string> = {
+    '/docs/guides/quickstart.md': 'Quickstart & Installation',
+    '/docs/guides/skills.md': 'Skill Plugin Development',
+    '/docs/architecture/react.md': 'ReAct Orchestration Loop',
+    '/docs/ecosystem/root.md': 'Monorepo Architecture Structure',
+    '/docs/ecosystem/core.md': 'Core Agent Engine Runtime',
+    '/docs/ecosystem/hermes.md': 'Hermes Communication Bus',
+    '/docs/ecosystem/openclaw.md': 'OpenClaw Web Automation Engine',
+    '/docs/ecosystem/playwright.md': 'Playwright Browser Engine',
+    '/docs/ecosystem/sqlite-memory.md': 'SQLite Vector Memory Engine',
+    '/docs/ecosystem/hiro-memory.md': 'Hiro-Memory TKG Architecture',
+    '/docs/ecosystem/hiro-cli.md': 'Hiro Terminal TUI',
+    '/docs/ecosystem/gateway.md': 'API Gateway Proxy',
+    '/docs/ecosystem/config.md': 'Configuration & Secret Vault',
+    '/docs/ecosystem/installer.md': 'Skill Installer Framework',
+    '/docs/ecosystem/scripts.md': 'Build & Release Automation',
+    '/docs/ecosystem/ui.md': 'React Web Dashboard UI',
+    '/docs/legal/privacy.md': 'Privacy & Telemetry Policy',
+    '/docs/legal/terms.md': 'Terms of Service & Usage SLA',
+    '/docs/legal/license.md': 'Apache 2.0 Open Source License',
+    '/docs/legal/soc2.md': 'SOC 2 Type II Security Controls',
+    '/docs/changelog.md': 'Changelog & Release Notes'
+  };
+
+  const categoryOrder = ['Guides', 'Architecture', 'Ecosystem', 'Legal', 'Release Logs', 'General'];
+
+  // Group loaded docs dynamically
+  const groupedDocs: Record<string, { path: string; label: string }[]> = {};
+
+  allDocs.forEach(doc => {
+    const cat = doc.category || 'General';
+    if (!groupedDocs[cat]) groupedDocs[cat] = [];
+    groupedDocs[cat].push({
+      path: doc.path,
+      label: labelMap[doc.path] || doc.title
+    });
+  });
+
+  const docNavGroups = Object.keys(groupedDocs)
+    .sort((a, b) => {
+      const idxA = categoryOrder.indexOf(a);
+      const idxB = categoryOrder.indexOf(b);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return a.localeCompare(b);
+    })
+    .map(category => ({
+      category,
+      items: groupedDocs[category]
+    }));
+
+  const currentDoc = getDocByPath(activePath) || getDocByPath('/docs/guides/quickstart.md') || allDocs[0];
 
   // Filter items if searching
   const filteredNav = docNavGroups.map(group => ({

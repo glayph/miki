@@ -1,80 +1,73 @@
-# Quickstart & Installation Guide
+# Quickstart & GitHub Pages Deployment Guide
 
-Welcome to **Miki** — the autonomous agentic framework designed for AI engineers and developers. This guide will walk you through setting up your first Miki agent project in under 2 minutes.
-
----
-
-## Prerequisites
-
-* **Node.js**: v18.0.0 or higher (or Bun v1.0+)
-* **API Key**: Gemini API Key or local Ollama endpoint
+Welcome to **glayph/Agent** — the autonomous agentic framework designed for AI engineers and developers. This project is a **100% Client-Side Single Page Application (SPA)** that can be hosted directly on **GitHub Pages** (`github.com`) without any backend server required.
 
 ---
 
-## 1. Installation
+## 1. Cloning the Repository
 
-Install the core package and the `@google/genai` SDK:
+To get started locally or fork for your own GitHub Pages deployment:
 
 ```bash
-npm install miki @google/genai
+git clone https://github.com/glayph/Agent.git
+cd Agent
+npm install
 ```
 
-Or using Yarn/PNPM/Bun:
+---
+
+## 2. Local Development & Preview
+
+Start the Vite dev server:
 
 ```bash
-bun add miki @google/genai
+npm run dev
+```
+
+Or build and preview the production static SPA bundle locally:
+
+```bash
+npm run build
+npx serve dist
 ```
 
 ---
 
-## 2. Environment Setup
+## 3. Hosting on GitHub Pages (`github.com`)
 
-Create a `.env` file in your root project directory:
+This repository is pre-configured with a GitHub Actions deployment workflow (`.github/workflows/deploy.yml`).
 
-```env
-GEMINI_API_KEY=your_gemini_api_key_here
-MIKI_MEMORY_DB=./data/miki_memory.db
-DISABLE_MIKI_TELEMETRY=0
+### Option A: Automatic Deployment via GitHub Actions (Recommended)
+1. Push your repository to GitHub: `https://github.com/your-username/Agent.git`
+2. Go to **Settings -> Pages** on your GitHub repository.
+3. Under **Source**, select **GitHub Actions**.
+4. Every time you push to `main` or `master`, your site will automatically build and deploy to `https://your-username.github.io/Agent/`.
+
+### Option B: Manual Static Build & `gh-pages` Branch
+```bash
+npm run build
+npx gh-pages -d dist
 ```
 
 ---
 
-## 3. Creating Your First Agent
+## 4. Creating & Running Agents Client-Side
 
 Create a file named `agent.ts`:
 
 ```typescript
-import { MikiAgent } from 'miki';
-import { GoogleGenAI } from '@google/genai';
+import { createAgent } from 'miki';
 
-const agent = new MikiAgent({
-  name: "CodeAssistant",
+const agent = createAgent({
+  name: "GlayphAgent",
   model: "gemini-2.5-flash",
-  memoryPath: "./data/miki_memory.db"
+  memoryDriver: "client-sqlite"
 });
 
 const response = await agent.run({
-  prompt: "Inspect package.json and summarize total project dependencies."
+  prompt: "Inspect target data and summarize findings."
 });
 
 console.log("Agent Thought Process:\n", response.thoughts);
 console.log("Final Answer:\n", response.output);
-```
-
----
-
-## 4. Running the Dev Server
-
-Execute using `tsx` or `ts-node`:
-
-```bash
-npx tsx agent.ts
-```
-
-Output:
-```
-[Miki ReAct] Phase 1: Thought -> Need to read package.json file.
-[Miki ReAct] Phase 2: Action  -> Calling tool: read_file({ path: "package.json" })
-[Miki ReAct] Phase 3: Observe -> Successfully read 36 lines.
-[Miki ReAct] Final Output    -> Dependencies count: 8 runtime, 7 dev.
 ```

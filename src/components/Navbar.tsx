@@ -48,10 +48,10 @@ export const Navbar: React.FC<NavbarProps> = ({ theme, onToggleTheme }) => {
           className="flex items-center gap-2 text-left group focus:outline-none"
         >
           <div className="font-mono font-black text-xl tracking-tighter text-[#F4F4F5] flex items-center">
-            <span className="text-[#FF5A3C]">{'{'}</span>MIKI<span className="text-[#FF5A3C]">{'}'}</span>
+            <span className="text-[#FF5A3C]">{'{'}</span>AGENT<span className="text-[#FF5A3C]">{'}'}</span>
           </div>
-          <span className="text-[10px] font-mono uppercase tracking-widest px-1.5 py-0.5 rounded-none bg-[#111113] border border-[#27272A] text-[#A1A1AA]">
-            v1.4.2
+          <span className="text-[10px] font-mono uppercase tracking-widest px-1.5 py-0.5 rounded-none bg-[#111113] border border-emerald-500/40 text-emerald-400 font-semibold">
+            glayph/Agent
           </span>
         </button>
 

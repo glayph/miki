@@ -65,10 +65,10 @@ export const Footer: React.FC<FooterProps> = ({ theme, onToggleTheme }) => {
         <div className="pt-8 border-t border-[#27272A] flex flex-col sm:flex-row items-center justify-between gap-4 text-[#A1A1AA]">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
             <div className="font-mono font-black text-sm tracking-tighter text-[#F4F4F5] flex items-center">
-              <span className="text-[#FF5A3C]">{'{'}</span>MIKI<span className="text-[#FF5A3C]">{'}'}</span>
+              <span className="text-[#FF5A3C]">{'{'}</span>AGENT<span className="text-[#FF5A3C]">{'}'}</span>
             </div>
-            <span className="text-[#F4F4F5] font-bold uppercase tracking-wider">miki agentic framework</span>
-            <span>© {new Date().getFullYear()} Miki Core Inc. All rights reserved.</span>
+            <span className="text-[#F4F4F5] font-bold uppercase tracking-wider">glayph/agent framework</span>
+            <span>© {new Date().getFullYear()} glayph/Agent. All rights reserved.</span>
           </div>
 
           <div className="flex items-center gap-4">
@@ -91,7 +91,7 @@ export const Footer: React.FC<FooterProps> = ({ theme, onToggleTheme }) => {
                 )}
               </button>
             )}
-            <span className="text-[#FF5A3C]">Express + Vite Fullstack Engine</span>
+            <span className="text-[#FF5A3C]">100% Client-Side SPA — GitHub Pages Ready</span>
           </div>
         </div>
 

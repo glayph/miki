@@ -51,21 +51,21 @@ export const Hero: React.FC<HeroProps> = ({ onGetStarted, onOpenDocs }) => {
         {/* Top Tech Badge */}
         <div className="flex justify-center mb-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-none bg-[#111113] border border-[#27272A] text-xs font-mono text-[#A1A1AA]">
-            <span className="w-2 h-2 bg-[#FF5A3C] animate-pulse" />
-            <span>OpenClaw & Hermes Compatible Engine</span>
+            <span className="w-2 h-2 bg-emerald-500 animate-pulse" />
+            <span className="text-emerald-400 font-semibold">100% Frontend (GitHub Pages Hostable)</span>
             <span className="text-[#27272A]">|</span>
-            <span className="text-[#F4F4F5]">Miki v1.4.2 Released</span>
+            <span className="text-[#F4F4F5]">glayph/Agent Framework</span>
           </div>
         </div>
 
         {/* Main Title & Copy */}
         <div className="text-center max-w-4xl mx-auto mb-12">
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tighter text-[#F4F4F5] uppercase leading-[0.95] mb-6">
-            Agentic Framework <br className="hidden sm:block" />
-            <span className="text-[#FF5A3C]">For Modern Devs.</span>
+            Autonomous Agent <br className="hidden sm:block" />
+            <span className="text-[#FF5A3C]">Pure Frontend Engine.</span>
           </h1>
           <p className="text-base sm:text-lg text-[#A1A1AA] leading-relaxed mb-8 max-w-2xl mx-auto">
-            Build, deploy, and scale autonomous agents with built-in memory, browser control, and universal skill compatibility. No hidden black boxes.
+            Build, deploy, and host autonomous ReAct agents on GitHub Pages without any server backend. Powered by client-side execution, layered memory, and universal skill compatibility.
           </p>
 
           {/* CTAs */}

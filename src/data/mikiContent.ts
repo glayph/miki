@@ -141,37 +141,48 @@ export const SqliteQuerySkill = defineSkill({
   }
 });`,
 
-  cliBoot: `$ npm i -g miki-cli
-$ miki init my-agent
-$ cd my-agent && miki start --port 3000
+  cliBoot: `$ git clone https://github.com/glayph/Agent.git
+$ cd Agent && npm install
+$ npm run build # Outputs 100% static SPA to /dist for GitHub Pages deployment
+$ npx serve dist # Local preview
 
-[MIKI] Server initialized on http://localhost:3000
-[MIKI] Connected memory engine: SQLite (./data/miki.db)
-[MIKI] Loaded 6 active skill plugins (OpenClaw bridge READY)
-[MIKI] Listening for WebSocket & HTTP ReAct requests...`
+[AGENT] 100% Frontend ReAct Engine active
+[AGENT] GitHub Pages deployment: gh-pages or GitHub Actions ready
+[AGENT] Connected memory driver: IndexedDB / SQLite (client-side)
+[AGENT] Loaded 6 active skill plugins (OpenClaw & Hermes bridges READY)`
 };
 
 export const QUICKSTART_DOCS = [
   {
     id: 'install',
-    title: '1. Installation',
-    code: `npm install miki @google/genai`
+    title: '1. Clone Repository & Install',
+    code: `git clone https://github.com/glayph/Agent.git
+cd Agent
+npm install`
   },
   {
-    id: 'init',
-    title: '2. Create Agent Instance',
-    code: `import { createAgent } from "miki";
+    id: 'build',
+    title: '2. Build & Deploy to GitHub Pages',
+    code: `# Build static SPA bundle for GitHub Pages hosting
+npm run build
 
-const agent = createAgent({
-  name: "miki-dev",
-  memory: { driver: "sqlite", path: "./data/agent.db" },
-  skills: ["browser", "web-search"],
-});`
+# Push to your GitHub repo to trigger auto-deployment workflow (.github/workflows/deploy.yml)
+git add .
+git commit -m "Deploy Agent frontend to GitHub Pages"
+git push origin main`
   },
   {
     id: 'run',
-    title: '3. Execute ReAct Task',
-    code: `const result = await agent.run("Find latest React 19 features and summarize");
+    title: '3. Execute Client-Side ReAct Task',
+    code: `import { createAgent } from "miki";
+
+const agent = createAgent({
+  name: "glayph-agent-client",
+  memory: { driver: "client-sqlite" },
+  skills: ["browser", "web-search"],
+});
+
+const result = await agent.run("Summarize latest tech trends");
 console.log("Status:", result.status);
 console.log("Output:", result.output);`
   }
