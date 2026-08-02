@@ -1,14 +1,26 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { 
-  BookOpen, Search, ChevronRight, ExternalLink, FileText, Sparkles 
+  BookOpen, Search, ChevronRight, ExternalLink, FileText, Sparkles,
+  Cpu, Boxes, ShieldCheck, GitCommit, Folder, Layers, X
 } from 'lucide-react';
 import { getAllDocs, getDocByPath, markdownStore } from '../utils/markdownLoader';
 import { MarkdownViewer } from '../components/MarkdownViewer';
 
+// Category icon mapper
+const categoryIcons: Record<string, React.ElementType> = {
+  'Guides': BookOpen,
+  'Architecture': Cpu,
+  'Ecosystem': Boxes,
+  'Legal': ShieldCheck,
+  'Release Logs': GitCommit,
+  'General': Folder,
+};
+
 export const DocsPage: React.FC = () => {
   const [activePath, setActivePath] = useState<string>('/docs/guides/quickstart.md');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [mobileNavOpen, setMobileNavOpen] = useState<boolean>(false);
 
   const allDocs = getAllDocs();
 
@@ -102,7 +114,7 @@ export const DocsPage: React.FC = () => {
             href="https://github.com/glayph/agent"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-3.5 py-1.5 text-xs font-mono text-[#A1A1AA] hover:text-white bg-[#111113] border border-[#27272A] rounded-lg flex items-center gap-2"
+            className="px-3.5 py-1.5 text-xs font-mono text-[#A1A1AA] hover:text-white bg-[#111113] border border-[#27272A] rounded-lg flex items-center gap-2 transition-colors"
           >
             GitHub Repository <ExternalLink className="w-3.5 h-3.5" />
           </a>
@@ -113,45 +125,108 @@ export const DocsPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         
         {/* Left Nav Sidebar */}
-        <div className="space-y-6 bg-[#111113] border border-[#27272A] rounded-xl p-4 h-fit">
-          <div className="relative mb-2">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#A1A1AA]" />
-            <input
-              type="text"
-              placeholder="Filter docs files..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-8 pr-3 py-1.5 bg-[#0A0A0B] border border-[#27272A] rounded-lg text-xs font-mono text-[#F4F4F5] outline-none focus:border-[#FF5A3C]"
-            />
+        <div className="bg-[#111113] border border-[#27272A] rounded-xl p-4 h-fit lg:sticky lg:top-24 space-y-4">
+          
+          {/* Sidebar Header & Mobile Toggle */}
+          <div className="flex items-center justify-between pb-3 border-b border-[#27272A]">
+            <div className="flex items-center gap-2">
+              <Layers className="w-4 h-4 text-[#FF5A3C]" />
+              <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#F4F4F5]">
+                Navigation Index
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[#1F1F23] text-[#A1A1AA] border border-[#27272A]">
+                {allDocs.length} docs
+              </span>
+              <button
+                onClick={() => setMobileNavOpen(!mobileNavOpen)}
+                className="lg:hidden p-1 bg-[#18181B] text-[#FF5A3C] border border-[#27272A] rounded text-xs font-mono"
+              >
+                {mobileNavOpen ? 'Hide' : 'Select Doc'}
+              </button>
+            </div>
           </div>
 
-          {filteredNav.map((cat, idx) => (
-            <div key={idx}>
-              <div className="text-[10px] font-mono uppercase tracking-wider text-[#FF5A3C] font-bold mb-2 px-2">
-                {cat.category}
-              </div>
-              <ul className="space-y-1">
-                {cat.items.map((item) => {
-                  const isActive = activePath === item.path;
-                  return (
-                    <li key={item.path}>
-                      <button
-                        onClick={() => setActivePath(item.path)}
-                        className={`w-full text-left px-2.5 py-1.5 text-xs font-mono rounded-md transition-all flex items-center justify-between ${
-                          isActive
-                            ? 'bg-[#0A0A0B] text-[#FF5A3C] font-bold border border-[#FF5A3C]/40'
-                            : 'text-[#A1A1AA] hover:text-[#F4F4F5] hover:bg-[#0A0A0B]'
-                        }`}
-                      >
-                        <span className="truncate">{item.label}</span>
-                        {isActive && <ChevronRight className="w-3 h-3 text-[#FF5A3C]" />}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
+          {/* Search Input & List Container (Always visible on lg, togglable on mobile) */}
+          <div className={`${mobileNavOpen ? 'block' : 'hidden lg:block'} space-y-4`}>
+            {/* Search Input */}
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#A1A1AA]" />
+              <input
+                type="text"
+                placeholder="Filter docs files..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-8 pr-8 py-2 bg-[#0A0A0B] border border-[#27272A] rounded-lg text-xs font-mono text-[#F4F4F5] outline-none focus:border-[#FF5A3C] transition-colors"
+              />
+              {searchQuery && (
+                <button 
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#A1A1AA] hover:text-white"
+                >
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              )}
             </div>
-          ))}
+
+            {/* Category List */}
+            <div className="space-y-5 max-h-[50vh] lg:max-h-[calc(100vh-240px)] overflow-y-auto pr-1 custom-scrollbar">
+              {filteredNav.map((cat, idx) => {
+                const CategoryIcon = categoryIcons[cat.category] || Folder;
+                return (
+                  <div key={idx} className="space-y-1.5">
+                    {/* Category Banner */}
+                    <div className="flex items-center justify-between px-2 py-1 rounded bg-[#18181B]/60 border border-[#27272A]/40">
+                      <div className="flex items-center gap-2">
+                        <CategoryIcon className="w-3.5 h-3.5 text-[#FF5A3C]" />
+                        <span className="text-[11px] font-mono uppercase tracking-wider text-[#F4F4F5] font-bold">
+                          {cat.category}
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-mono text-[#71717A] bg-[#0A0A0B] px-1.5 py-0.2 rounded border border-[#27272A]">
+                        {cat.items.length}
+                      </span>
+                    </div>
+
+                    {/* Sub-items */}
+                    <ul className="space-y-0.5 pl-1">
+                      {cat.items.map((item) => {
+                        const isActive = activePath === item.path;
+                        return (
+                          <li key={item.path}>
+                            <button
+                              onClick={() => {
+                                setActivePath(item.path);
+                                setMobileNavOpen(false);
+                              }}
+                              className={`w-full text-left px-2.5 py-2 text-xs font-mono rounded-md transition-all flex items-center justify-between group min-h-[38px] ${
+                                isActive
+                                  ? 'bg-[#FF5A3C]/10 text-[#FF5A3C] font-semibold border-l-2 border-[#FF5A3C] pl-3'
+                                  : 'text-[#A1A1AA] hover:text-[#F4F4F5] hover:bg-[#18181B]'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 truncate">
+                                <FileText className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-[#FF5A3C]' : 'text-[#52525B] group-hover:text-[#A1A1AA]'}`} />
+                                <span className="truncate">{item.label}</span>
+                              </div>
+                              {isActive && <ChevronRight className="w-3.5 h-3.5 text-[#FF5A3C] shrink-0 ml-1" />}
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                );
+              })}
+
+              {filteredNav.length === 0 && (
+                <div className="text-center py-6 text-xs font-mono text-[#71717A]">
+                  No matching documentation files found.
+                </div>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Right Content Reader */}
@@ -173,4 +248,5 @@ export const DocsPage: React.FC = () => {
     </motion.div>
   );
 };
+
 

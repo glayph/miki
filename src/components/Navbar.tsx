@@ -133,37 +133,67 @@ export const Navbar: React.FC<NavbarProps> = ({ theme, onToggleTheme }) => {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#0A0A0B] border-b border-[#27272A] px-4 py-4 space-y-2">
-          {navItems.map((item) => (
-            <button
-              key={item.path}
-              onClick={() => handleNavClick(item.path)}
-              className="w-full text-left px-3 py-2 text-sm font-mono rounded-none text-[#A1A1AA] hover:text-[#F4F4F5] hover:bg-[#111113]"
-            >
-              {item.label}
-            </button>
-          ))}
-          <div className="pt-2 border-t border-[#27272A] flex flex-col gap-2">
+        <div className="md:hidden bg-[#0A0A0B]/98 backdrop-blur-lg border-b border-[#27272A] px-4 py-4 space-y-2.5 animate-in fade-in slide-in-from-top-2 duration-150">
+          <div className="space-y-1">
+            {navItems.map((item) => {
+              const isActive = pathname === item.path || (item.path !== '/' && pathname.startsWith(item.path));
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => handleNavClick(item.path)}
+                  className={`w-full text-left px-3.5 py-2.5 text-sm font-mono rounded-none transition-all flex items-center justify-between min-h-[44px] ${
+                    isActive
+                      ? 'text-[#FF5A3C] bg-[#111113] border-l-2 border-[#FF5A3C] font-semibold pl-4'
+                      : 'text-[#A1A1AA] hover:text-[#F4F4F5] hover:bg-[#111113]'
+                  }`}
+                >
+                  <span>{item.label}</span>
+                  {isActive && <span className="w-1.5 h-1.5 bg-[#FF5A3C]" />}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="pt-3 border-t border-[#27272A] flex flex-col gap-2.5">
             {onToggleTheme && (
               <button
                 onClick={onToggleTheme}
-                className="w-full text-left px-3 py-2 text-sm font-mono text-[#A1A1AA] hover:text-[#F4F4F5] bg-[#111113] border border-[#27272A] rounded-none flex items-center justify-between"
+                className="w-full text-left px-3.5 py-2.5 text-sm font-mono text-[#A1A1AA] hover:text-[#F4F4F5] bg-[#111113] border border-[#27272A] rounded-none flex items-center justify-between min-h-[44px]"
               >
-                <span>Theme: {theme === 'dark' ? 'Dark' : 'Light'}</span>
+                <span>Theme: <strong className="text-[#F4F4F5]">{theme === 'dark' ? 'Dark Mode' : 'Light Mode'}</strong></span>
                 {theme === 'dark' ? <Sun className="w-4 h-4 text-[#FF5A3C]" /> : <Moon className="w-4 h-4 text-[#FF5A3C]" />}
               </button>
             )}
-            <button
-              onClick={() => handleNavClick('/docs')}
-              className="w-full text-center py-2 text-sm font-mono text-[#A1A1AA] bg-[#111113] border border-[#27272A] rounded-none"
-            >
-              Documentation
-            </button>
+
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                onClick={() => handleNavClick('/docs')}
+                className={`py-2.5 px-3 text-center text-xs font-mono font-medium rounded-none border transition-colors min-h-[44px] flex items-center justify-center ${
+                  pathname === '/docs'
+                    ? 'text-[#FF5A3C] bg-[#111113] border-[#FF5A3C]'
+                    : 'text-[#A1A1AA] bg-[#111113] border-[#27272A] hover:text-[#F4F4F5]'
+                }`}
+              >
+                Documentation
+              </button>
+
+              <a
+                href="https://github.com/glayph/agent"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="py-2.5 px-3 text-center text-xs font-mono text-[#A1A1AA] hover:text-[#F4F4F5] bg-[#111113] border border-[#27272A] rounded-none flex items-center justify-center gap-1.5 min-h-[44px]"
+              >
+                <Github className="w-4 h-4" />
+                <span>GitHub</span>
+              </a>
+            </div>
+
             <button
               onClick={() => handleNavClick('/marketplace')}
-              className="w-full text-center py-2 text-sm font-mono font-medium text-white bg-[#FF5A3C] rounded-none"
+              className="w-full text-center py-3 text-xs font-mono font-bold uppercase text-white bg-[#FF5A3C] hover:bg-[#FF7A5C] rounded-none shadow-md flex items-center justify-center gap-2 min-h-[44px]"
             >
-              Get Started / Skills
+              <Sparkles className="w-4 h-4" />
+              Get Started / Skills Registry
             </button>
           </div>
         </div>

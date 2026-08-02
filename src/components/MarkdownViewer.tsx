@@ -20,7 +20,6 @@ export const MarkdownViewer: React.FC<MarkdownViewerProps> = ({
 }) => {
   const [viewMode, setViewMode] = useState<'rendered' | 'raw'>('rendered');
   const [copiedCode, setCopiedCode] = useState<boolean>(false);
-  const [showEditInfo, setShowEditInfo] = useState<boolean>(false);
 
   const handleCopyRaw = () => {
     navigator.clipboard.writeText(content);
@@ -35,32 +34,17 @@ export const MarkdownViewer: React.FC<MarkdownViewerProps> = ({
       {/* Top Header & Inspector Control Bar */}
       <div className="bg-[#0A0A0B] border-b border-[#27272A] px-4 py-3 flex flex-wrap items-center justify-between gap-3">
         
-        {/* Left: Metadata & File Path Badge */}
+        {/* Left: Metadata Category */}
         <div className="flex items-center gap-2 flex-wrap">
           {category && (
             <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded bg-[#18181B] border border-[#27272A] text-[#FF5A3C] font-bold">
               {category}
             </span>
           )}
-          <div className="flex items-center gap-1.5 px-2.5 py-1 bg-[#18181B] border border-[#27272A] rounded text-xs font-mono text-[#F4F4F5]">
-            <FileText className="w-3.5 h-3.5 text-[#FF5A3C]" />
-            <span className="text-[#A1A1AA]">Source:</span>
-            <span className="text-[#FF5A3C] font-bold">{filePath}</span>
-          </div>
         </div>
 
         {/* Right: Controls & Toggles */}
         <div className="flex items-center gap-2">
-          {/* Edit Source Inspector Info */}
-          <button
-            onClick={() => setShowEditInfo(!showEditInfo)}
-            className="px-2.5 py-1 bg-[#18181B] hover:bg-[#27272A] border border-[#27272A] text-[#A1A1AA] hover:text-white rounded text-xs font-mono flex items-center gap-1.5 transition-colors"
-            title="Learn how to edit this documentation file"
-          >
-            <Edit3 className="w-3.5 h-3.5 text-[#FF5A3C]" />
-            <span>Edit Source</span>
-          </button>
-
           {/* Rendered vs Raw Toggle */}
           <div className="flex items-center bg-[#18181B] p-0.5 border border-[#27272A] rounded">
             <button
@@ -97,22 +81,6 @@ export const MarkdownViewer: React.FC<MarkdownViewerProps> = ({
           </button>
         </div>
       </div>
-
-      {/* Edit Source Info Banner */}
-      {showEditInfo && (
-        <div className="bg-[#18181B] border-b border-[#27272A] p-4 text-xs font-mono text-[#F4F4F5] flex items-start gap-3">
-          <Info className="w-4 h-4 text-[#FF5A3C] shrink-0 mt-0.5" />
-          <div className="space-y-1">
-            <div className="font-bold text-[#FF5A3C]">Dynamic Markdown Sync Active</div>
-            <p className="text-[#A1A1AA]">
-              This documentation section is driven by <code className="text-white px-1 py-0.5 bg-[#0A0A0B] rounded border border-[#27272A]">{filePath}</code>.
-            </p>
-            <p className="text-[#A1A1AA]">
-              To update this page, simply edit the file in your repository or AI Studio code editor. Vite's eager glob loader will automatically hot-reload the changes without requiring build restarts!
-            </p>
-          </div>
-        </div>
-      )}
 
       {/* Main Body */}
       <div className="p-6 sm:p-8">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { DocsModal } from './components/DocsModal';
@@ -161,11 +161,21 @@ export default function App() {
         <Navbar theme={theme} onToggleTheme={toggleTheme} />
 
         {/* Main Routed Page Content with Framer Motion Page Transition */}
-        <main>
-          <AnimatePresence mode="wait">
-            <React.Fragment key={pathname}>
+        <main className="w-full flex-1 overflow-x-hidden">
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{
+                duration: 0.24,
+                ease: [0.16, 1, 0.3, 1],
+              }}
+              className="w-full"
+            >
               {renderCurrentPage()}
-            </React.Fragment>
+            </motion.div>
           </AnimatePresence>
         </main>
       </div>

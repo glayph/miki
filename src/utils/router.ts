@@ -19,7 +19,7 @@ export function navigate(path: string) {
       window.dispatchEvent(new Event('popstate'));
     }
   }
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo(0, 0);
 }
 
 export function usePathname(): string {

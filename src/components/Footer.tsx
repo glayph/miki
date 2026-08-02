@@ -62,8 +62,8 @@ export const Footer: React.FC<FooterProps> = ({ theme, onToggleTheme }) => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-[#27272A] flex flex-col sm:flex-row items-center justify-between gap-4 text-[#A1A1AA]">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
+        <div className="pt-8 border-t border-[#27272A] flex flex-col md:flex-row items-center justify-between gap-4 text-[#A1A1AA] text-center md:text-left">
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 cursor-pointer" onClick={() => navigate('/')}>
             <div className="font-mono font-black text-sm tracking-tighter text-[#F4F4F5] flex items-center">
               <span className="text-[#FF5A3C]">{'{'}</span>AGENT<span className="text-[#FF5A3C]">{'}'}</span>
             </div>
@@ -71,11 +71,11 @@ export const Footer: React.FC<FooterProps> = ({ theme, onToggleTheme }) => {
             <span>© {new Date().getFullYear()} glayph/Agent. All rights reserved.</span>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-3">
             {onToggleTheme && (
               <button
                 onClick={onToggleTheme}
-                className="px-2.5 py-1 text-[#A1A1AA] hover:text-[#F4F4F5] bg-[#111113] border border-[#27272A] rounded flex items-center gap-1.5 transition-colors"
+                className="px-3 py-1.5 text-[#A1A1AA] hover:text-[#F4F4F5] bg-[#111113] border border-[#27272A] rounded flex items-center gap-1.5 transition-colors min-h-[36px]"
                 title="Toggle Theme"
               >
                 {theme === 'dark' ? (
@@ -91,7 +91,7 @@ export const Footer: React.FC<FooterProps> = ({ theme, onToggleTheme }) => {
                 )}
               </button>
             )}
-            <span className="text-[#FF5A3C]">100% Client-Side SPA — GitHub Pages Ready</span>
+            <span className="text-[#FF5A3C] font-semibold">100% Client-Side SPA — GitHub Pages Ready</span>
           </div>
         </div>
 

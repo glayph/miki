@@ -41,38 +41,32 @@ export const Hero: React.FC<HeroProps> = ({ onGetStarted, onOpenDocs }) => {
   };
 
   return (
-    <section id="overview" className="relative pt-12 pb-20 md:pt-20 md:pb-28 border-b border-[#27272A] bg-[#0A0A0B]">
+    <section id="overview" className="relative pt-12 pb-16 md:pt-20 md:pb-24 border-b border-[#1c1c22] bg-[#060608]">
       
       {/* Background Grid Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#111113_1px,transparent_1px),linear-gradient(to_bottom,#111113_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-40 pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#111118_1px,transparent_1px),linear-gradient(to_bottom,#111118_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-40 pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         
-        {/* Top Tech Badge */}
-        <div className="flex justify-center mb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-none bg-[#111113] border border-[#27272A] text-xs font-mono text-[#A1A1AA]">
-            <span className="w-2 h-2 bg-emerald-500 animate-pulse" />
-            <span className="text-emerald-400 font-semibold">100% Frontend (GitHub Pages Hostable)</span>
-            <span className="text-[#27272A]">|</span>
-            <span className="text-[#F4F4F5]">glayph/Agent Framework</span>
-          </div>
-        </div>
-
         {/* Main Title & Copy */}
-        <div className="text-center max-w-4xl mx-auto mb-12">
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tighter text-[#F4F4F5] uppercase leading-[0.95] mb-6">
+        <div className="text-center max-w-4xl mx-auto mb-10 sm:mb-12">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#0e0e12] border border-[#1c1c24] text-xs font-mono font-bold text-[#FF5A3C] uppercase mb-4 tracking-wider">
+            <span>◆</span> Autonomous ReAct Agent Framework
+          </div>
+
+          <h1 className="text-3xl sm:text-6xl lg:text-7xl font-black tracking-tighter text-[#F4F4F5] uppercase leading-[1.02] sm:leading-[0.95] mb-4 sm:mb-6">
             Autonomous Agent <br className="hidden sm:block" />
             <span className="text-[#FF5A3C]">Pure Frontend Engine.</span>
           </h1>
-          <p className="text-base sm:text-lg text-[#A1A1AA] leading-relaxed mb-8 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-lg text-[#A1A1AA] leading-relaxed mb-6 sm:mb-8 max-w-2xl mx-auto px-2">
             Build, deploy, and host autonomous ReAct agents on GitHub Pages without any server backend. Powered by client-side execution, layered memory, and universal skill compatibility.
           </p>
 
           {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 px-2">
             <button
               onClick={onGetStarted}
-              className="w-full sm:w-auto px-7 py-3.5 text-xs font-mono font-bold uppercase tracking-wider text-white bg-[#FF5A3C] hover:bg-[#FF7A5C] rounded-none transition-all shadow-lg flex items-center justify-center gap-2 group"
+              className="w-full sm:w-auto px-7 py-3.5 text-xs font-mono font-bold uppercase tracking-wider text-white bg-[#FF5A3C] hover:bg-[#FF7A5C] rounded-full transition-all shadow-lg flex items-center justify-center gap-2 group min-h-[44px]"
             >
               Start Building Now
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -82,7 +76,7 @@ export const Hero: React.FC<HeroProps> = ({ onGetStarted, onOpenDocs }) => {
               href="https://github.com/glayph/agent"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto px-7 py-3.5 text-xs font-mono font-bold uppercase tracking-wider text-[#F4F4F5] bg-[#111113] hover:bg-[#111113]/80 border border-[#27272A] hover:border-[#A1A1AA]/50 rounded-none transition-all flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-7 py-3.5 text-xs font-mono font-bold uppercase tracking-wider text-[#F4F4F5] bg-[#0e0e12] hover:bg-[#14141a] border border-[#1c1c24] hover:border-[#2a2a36] rounded-full transition-all flex items-center justify-center gap-2 min-h-[44px]"
             >
               <Github className="w-4 h-4" />
               View on GitHub
@@ -91,27 +85,27 @@ export const Hero: React.FC<HeroProps> = ({ onGetStarted, onOpenDocs }) => {
         </div>
 
         {/* Interactive Code & Sandbox Terminal */}
-        <div className="max-w-5xl mx-auto rounded-none border border-[#27272A] bg-[#111113] overflow-hidden shadow-2xl">
+        <div className="max-w-5xl mx-auto rounded-2xl border border-[#1c1c24] bg-[#0e0e12] overflow-hidden shadow-2xl">
           
           {/* Terminal Topbar */}
-          <div className="px-4 py-3 bg-[#0A0A0B] border-b border-[#27272A] flex flex-wrap items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 bg-[#3F3F46]" />
-              <div className="w-2.5 h-2.5 bg-[#27272A]" />
-              <div className="w-2.5 h-2.5 bg-[#18181B]" />
-              <span className="ml-2 text-xs font-mono text-[#A1A1AA] flex items-center gap-1.5">
-                <TerminalIcon className="w-3.5 h-3.5 text-[#FF5A3C]" />
-                miki-kernel // interactive terminal
+          <div className="px-3 sm:px-4 py-3 bg-[#08080a] border-b border-[#1c1c24] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
+            <div className="flex items-center gap-2 shrink-0">
+              <div className="w-2.5 h-2.5 rounded-full bg-[#3F3F46]" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[#27272A]" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[#18181B]" />
+              <span className="ml-2 text-xs font-mono text-[#A1A1AA] flex items-center gap-1.5 truncate">
+                <TerminalIcon className="w-3.5 h-3.5 text-[#FF5A3C] shrink-0" />
+                <span className="truncate">miki-kernel // interactive terminal</span>
               </span>
             </div>
 
-            {/* Terminal Tabs */}
-            <div className="flex items-center gap-1">
+            {/* Terminal Tabs - Scrollable on Mobile */}
+            <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto pb-1 sm:pb-0 scrollbar-none shrink-0">
               <button
                 onClick={() => setActiveTab('quickstart')}
-                className={`px-2.5 py-1 text-xs font-mono rounded-none ${
+                className={`px-3 py-1.5 text-xs font-mono rounded-full whitespace-nowrap shrink-0 transition-all ${
                   activeTab === 'quickstart'
-                    ? 'bg-[#111113] text-[#FF5A3C] border border-[#FF5A3C]/40 font-semibold'
+                    ? 'bg-[#14141a] text-[#FF5A3C] border border-[#FF5A3C]/40 font-semibold'
                     : 'text-[#A1A1AA] hover:text-[#F4F4F5]'
                 }`}
               >
@@ -119,9 +113,9 @@ export const Hero: React.FC<HeroProps> = ({ onGetStarted, onOpenDocs }) => {
               </button>
               <button
                 onClick={() => setActiveTab('customSkill')}
-                className={`px-2.5 py-1 text-xs font-mono rounded-none ${
+                className={`px-3 py-1.5 text-xs font-mono rounded-full whitespace-nowrap shrink-0 transition-all ${
                   activeTab === 'customSkill'
-                    ? 'bg-[#111113] text-[#FF5A3C] border border-[#FF5A3C]/40 font-semibold'
+                    ? 'bg-[#14141a] text-[#FF5A3C] border border-[#FF5A3C]/40 font-semibold'
                     : 'text-[#A1A1AA] hover:text-[#F4F4F5]'
                 }`}
               >
@@ -129,9 +123,9 @@ export const Hero: React.FC<HeroProps> = ({ onGetStarted, onOpenDocs }) => {
               </button>
               <button
                 onClick={() => setActiveTab('cliBoot')}
-                className={`px-2.5 py-1 text-xs font-mono rounded-none ${
+                className={`px-3 py-1.5 text-xs font-mono rounded-full whitespace-nowrap shrink-0 transition-all ${
                   activeTab === 'cliBoot'
-                    ? 'bg-[#111113] text-[#FF5A3C] border border-[#FF5A3C]/40 font-semibold'
+                    ? 'bg-[#14141a] text-[#FF5A3C] border border-[#FF5A3C]/40 font-semibold'
                     : 'text-[#A1A1AA] hover:text-[#F4F4F5]'
                 }`}
               >
@@ -139,7 +133,7 @@ export const Hero: React.FC<HeroProps> = ({ onGetStarted, onOpenDocs }) => {
               </button>
               <button
                 onClick={() => setActiveTab('sandbox')}
-                className={`px-2.5 py-1 text-xs font-mono rounded-none flex items-center gap-1 ${
+                className={`px-3 py-1.5 text-xs font-mono rounded-full flex items-center gap-1 whitespace-nowrap shrink-0 transition-all ${
                   activeTab === 'sandbox'
                     ? 'bg-[#FF5A3C] text-white font-semibold'
                     : 'bg-[#FF5A3C]/10 text-[#FF5A3C] hover:bg-[#FF5A3C]/20 border border-[#FF5A3C]/30'
@@ -152,10 +146,10 @@ export const Hero: React.FC<HeroProps> = ({ onGetStarted, onOpenDocs }) => {
           </div>
 
           {/* Terminal Body */}
-          <div className="p-4 sm:p-6 font-mono text-xs sm:text-sm text-[#F4F4F5] min-h-[280px] bg-[#0A0A0B]/60">
+          <div className="p-4 sm:p-6 font-mono text-xs sm:text-sm text-[#F4F4F5] min-h-[280px] bg-[#08080a]/60">
             {activeTab === 'sandbox' ? (
               <div className="space-y-4">
-                <div className="p-3 rounded-none bg-[#111113] border border-[#27272A]">
+                <div className="p-3.5 rounded-xl bg-[#0e0e12] border border-[#1c1c24]">
                   <div className="text-xs text-[#A1A1AA] mb-2 flex items-center justify-between">
                     <span>TYPE TASK PROMPT FOR MIKI RE-ACT AGENT:</span>
                     <span className="text-[#FF5A3C]">Pure Frontend ReAct Engine</span>
@@ -166,12 +160,12 @@ export const Hero: React.FC<HeroProps> = ({ onGetStarted, onOpenDocs }) => {
                       value={prompt}
                       onChange={(e) => setPrompt(e.target.value)}
                       placeholder="e.g. Inspect target web page and persist findings to memory.db"
-                      className="flex-1 bg-[#0A0A0B] border border-[#27272A] rounded-none px-3 py-2 text-xs font-mono text-[#F4F4F5] focus:outline-none focus:border-[#FF5A3C]"
+                      className="flex-1 bg-[#08080a] border border-[#1c1c24] focus:border-[#FF5A3C] rounded-full px-4 py-2 text-xs font-mono text-[#F4F4F5] focus:outline-none min-h-[38px]"
                     />
                     <button
                       onClick={handleRunAgent}
                       disabled={isRunning}
-                      className="px-4 py-2 bg-[#FF5A3C] hover:bg-[#FF7A5C] text-white rounded-none text-xs font-mono font-medium flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50"
+                      className="px-5 py-2 bg-[#FF5A3C] hover:bg-[#FF7A5C] text-white rounded-full text-xs font-mono font-medium flex items-center justify-center gap-1.5 transition-colors disabled:opacity-50 min-h-[38px]"
                     >
                       {isRunning ? (
                         <>
@@ -190,14 +184,14 @@ export const Hero: React.FC<HeroProps> = ({ onGetStarted, onOpenDocs }) => {
 
                 {/* Agent Execution Logs & Result */}
                 {sandboxError && (
-                  <div className="p-3 bg-red-950/40 border border-red-800 text-red-300 rounded-none text-xs">
+                  <div className="p-3.5 bg-red-950/40 border border-red-800 text-red-300 rounded-xl text-xs">
                     {sandboxError}
                   </div>
                 )}
 
                 {agentResult && (
                   <div className="space-y-3">
-                    <div className="flex items-center justify-between text-xs text-[#A1A1AA] border-b border-[#27272A] pb-1">
+                    <div className="flex items-center justify-between text-xs text-[#A1A1AA] border-b border-[#1c1c24] pb-1">
                       <span>RUN ID: {agentResult.runId}</span>
                       <span>TIME: {agentResult.executionTimeMs}ms</span>
                     </div>
@@ -206,14 +200,14 @@ export const Hero: React.FC<HeroProps> = ({ onGetStarted, onOpenDocs }) => {
                     <div className="space-y-2">
                       <div className="text-xs font-semibold text-[#FF5A3C]">RE-ACT STEP LOGS:</div>
                       {agentResult.steps.map((s) => (
-                        <div key={s.step} className="p-2.5 rounded-none bg-[#111113] border border-[#27272A] text-xs space-y-1">
+                        <div key={s.step} className="p-3 rounded-xl bg-[#0e0e12] border border-[#1c1c24] text-xs space-y-1">
                           <div className="flex items-center justify-between text-[#A1A1AA]">
                             <span className="uppercase font-bold text-[#FF5A3C]">[STEP {s.step}: {s.type}]</span>
                             <span>{s.latencyMs}ms</span>
                           </div>
                           <p className="text-[#F4F4F5]">{s.content}</p>
                           {s.code && (
-                            <pre className="p-2 rounded-none bg-[#0A0A0B] text-[11px] text-[#A1A1AA] overflow-x-auto border border-[#27272A]">
+                            <pre className="p-2 rounded-lg bg-[#08080a] text-[11px] text-[#A1A1AA] overflow-x-auto border border-[#1c1c24]">
                               {s.code}
                             </pre>
                           )}
@@ -222,7 +216,7 @@ export const Hero: React.FC<HeroProps> = ({ onGetStarted, onOpenDocs }) => {
                     </div>
 
                     {/* Output Box */}
-                    <div className="p-3 rounded-none bg-[#111113] border border-[#FF5A3C]/30 text-xs">
+                    <div className="p-3.5 rounded-xl bg-[#0e0e12] border border-[#FF5A3C]/30 text-xs">
                       <div className="text-xs font-bold text-[#FF5A3C] mb-1">SYNTHESIZED AGENT OUTPUT:</div>
                       <div className="text-[#F4F4F5] whitespace-pre-wrap">{agentResult.output}</div>
                     </div>
@@ -239,7 +233,7 @@ export const Hero: React.FC<HeroProps> = ({ onGetStarted, onOpenDocs }) => {
               <div className="relative group">
                 <button
                   onClick={() => handleCopy(HERO_CODE_SNIPPETS[activeTab as keyof typeof HERO_CODE_SNIPPETS])}
-                  className="absolute top-0 right-0 p-1.5 text-[#A1A1AA] hover:text-[#F4F4F5] bg-[#111113] border border-[#27272A] rounded-none transition-colors"
+                  className="absolute top-0 right-0 p-1.5 text-[#A1A1AA] hover:text-[#F4F4F5] bg-[#0e0e12] border border-[#1c1c24] rounded-full transition-colors"
                   title="Copy snippet"
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-green-400" /> : <Copy className="w-3.5 h-3.5" />}
@@ -252,9 +246,9 @@ export const Hero: React.FC<HeroProps> = ({ onGetStarted, onOpenDocs }) => {
           </div>
 
           {/* Terminal Footer Info */}
-          <div className="px-4 py-2 bg-[#0A0A0B] border-t border-[#27272A] flex flex-wrap items-center justify-between text-[11px] text-[#A1A1AA] font-mono">
+          <div className="px-4 py-2.5 bg-[#08080a] border-t border-[#1c1c24] flex flex-wrap items-center justify-between text-[11px] text-[#A1A1AA] font-mono">
             <span className="flex items-center gap-2">
-              <span className="w-2 h-2 bg-emerald-500" />
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
               SQLite Memory: ONLINE
             </span>
             <span className="flex items-center gap-3">
