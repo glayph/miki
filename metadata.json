@@ -1,6 +1,0 @@
-{
-  "name": "Agent (glayph)",
-  "description": "Autonomous ReAct Agentic Framework with Layered Memory, Chromium Browser Automation, and Universal Skill Engine. 100% Client-Side SPA Hostable on GitHub Pages (github.com/glayph/Agent).",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
