@@ -1,9 +1,7 @@
-// Small, accessible interactions
-document.getElementById('year').textContent = new Date().getFullYear();
-const cta = document.getElementById('cta');
-cta.addEventListener('click', ()=>{
-  cta.setAttribute('aria-pressed','true');
-  cta.textContent = 'Hello!';
-  cta.disabled = true;
-  setTimeout(()=>{cta.disabled=false;cta.removeAttribute('aria-pressed');cta.textContent='Say Hello'},1400);
+const year = document.getElementById("year");
+const helloButton = document.getElementById("hello-button");
+const helloMessage = document.getElementById("hello-message");
+year.textContent = new Date().getFullYear();
+helloButton.addEventListener("click", () => {
+  helloMessage.textContent = "Hello from Miki — thanks for stopping by!";
 });

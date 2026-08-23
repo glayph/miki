@@ -1,42 +1,54 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Hello World — Miki Landing</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A small, welcoming Hello World landing page from Miki.">
+  <title>Hello World — Miki</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
-  <header class="site-header" role="banner">
-    <div class="container">
-      <h1 class="logo">Miki</h1>
-      <nav aria-label="Primary" class="nav">
+  <header class="site-header">
+    <div class="container nav-wrap">
+      <a class="brand" href="/" aria-label="Miki home">Miki</a>
+      <nav aria-label="Primary navigation">
         <a href="#features">Features</a>
         <a href="#about">About</a>
-        <a href="#contact">Contact</a>
       </nav>
     </div>
   </header>
-
-  <main id="main" class="hero" role="main">
-    <div class="container hero-inner">
-      <h2 class="eyebrow">Welcome</h2>
-      <h1 class="headline">Hello, world!</h1>
-      <p class="lead">This is a small, responsive and accessible landing page example — polished, fast, and keyboard-friendly.</p>
-      <div class="actions">
-        <button id="cta" class="btn">Say Hello</button>
-        <a class="btn ghost" href="#about">Learn more</a>
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container hero-grid">
+        <div>
+          <p class="eyebrow">A tiny welcome from Miki</p>
+          <h1 id="hero-title">Hello, world!</h1>
+          <p class="lede">A responsive, accessible starting point for thoughtful digital work.</p>
+          <div class="actions">
+            <button class="button" id="hello-button" type="button">Say hello</button>
+            <a class="button secondary" href="#about">Explore the page</a>
+          </div>
+          <p class="live-message" id="hello-message" role="status" aria-live="polite"></p>
+        </div>
+        <div class="orb" aria-hidden="true"><span>Hi</span></div>
       </div>
-    </div>
+    </section>
+    <section class="features container" id="features" aria-labelledby="features-title">
+      <p class="eyebrow">Built for a good first impression</p>
+      <h2 id="features-title">Simple, useful, and ready to grow.</h2>
+      <div class="feature-grid">
+        <article><h3>Clear</h3><p>Focused content makes the next step easy to find.</p></article>
+        <article><h3>Responsive</h3><p>A fluid layout stays comfortable on small and large screens.</p></article>
+        <article><h3>Accessible</h3><p>Semantic structure, focus states, and live feedback come first.</p></article>
+      </div>
+    </section>
+    <section class="about container" id="about" aria-labelledby="about-title">
+      <h2 id="about-title">A warm hello is a strong beginning.</h2>
+      <p>Miki helps turn ideas into calm, practical progress—one well-defined step at a time.</p>
+    </section>
   </main>
-
-  <footer class="site-footer" role="contentinfo">
-    <div class="container">
-      <p>&copy; <span id="year"></span> Miki — Hello World demo · Miki automation iteration 1.</p>
-    </div>
-  </footer>
-
+  <footer class="site-footer"><div class="container"><p>© <span id="year"></span> Miki · Hello World.</p></div></footer>
   <script src="script.js"></script>
 </body>
 </html>
