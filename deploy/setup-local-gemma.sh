@@ -6,9 +6,9 @@ DATA_HOME="${XDG_DATA_HOME:-$HOME/.local/share}/miki"
 MODEL_DIR="${MIKI_LOCAL_MODEL_DIR:-${DATA_HOME}/models}"
 MODEL_PATH="${MODEL_DIR}/gemma-4-E2B-it-Q4_0.gguf"
 PART_PATH="${MODEL_PATH}.$$.part"
-MODEL_URL="https://huggingface.co/ggml-org/gemma-4-E2B-it-GGUF/resolve/main/gemma-4-E2B-it-Q4_0.gguf?download=true"
-EXPECTED_SHA256="eff5313720ed419c369e56a37e6b617f9e4078821d070b16adeb5d723021e6bd"
-EXPECTED_BYTES="2843934688"
+MODEL_URL="https://huggingface.co/ggml-org/gemma-4-E2B-it-GGUF/resolve/858dcdf955fb1b5a43ed2301aea00362fc443a5c/gemma-4-E2B-it-Q4_0.gguf?download=true"
+EXPECTED_SHA256="8e30dff3ac4c8434c49a7036fa15564bdbb6044e42bf04550bf1a096ad7e6a52"
+EXPECTED_BYTES="2841481184"
 
 mkdir -p "$MODEL_DIR"
 chmod 700 "$DATA_HOME" "$MODEL_DIR" 2>/dev/null || true

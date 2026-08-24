@@ -67,7 +67,13 @@ The first local LFS probe failed only because the clean Linux environment did no
 | --- | --- | --- |
 | Workspace reconciliation | Resolved | The resumed workspace initially pointed at `4d8849c`; `git fetch` and fast-forward restored canonical `821b833`. |
 | Resumed Git LFS dependency | Resolved | `git-lfs` was absent in the resumed Linux environment; it was installed, `git lfs pull` fetched the 15 MB native object, and `git lfs fsck` passed. |
-| Local Gemma recheck | Passed | The managed llama.cpp endpoint returned the exact `MIKI_LOCAL_RECHECK_OK` response; model SHA-256 remained `eff5313720ed419c369e56a37e6b617f9e4078821d070b16adeb5d723021e6bd`. |
+| Local Gemma recheck | Passed after catalog repair | The first resumed self-install used stale moving-main metadata and correctly rejected the live file. The catalog is now pinned to official revision `858dcdf955fb1b5a43ed2301aea00362fc443a5c`; the current artifact is 2,841,481,184 bytes with SHA-256 `8e30dff3ac4c8434c49a7036fa15564bdbb6044e42bf04550bf1a096ad7e6a52`. |
 | 24/7 readiness | Passed | `npm run runtime:24-7:check` confirmed the gateway entry and runtime roots. |
 | Local LFS full validation | Passed | `npm run build:lfs -- --full --no-archive` completed native build, all 53 frontend tests, repository verification, and LFS checks. |
 | Schedule continuity | Passed | The recurring schedule remains active at 10,800 seconds with `runAsNewTask=false`. |
+
+The resumed canonical checkout exposed an important maintenance issue: Hugging Face’s moving `resolve/main` artifact had changed while Miki still stored the previous size and checksum. The self-installer correctly refused the mismatched file rather than using an unverified model. Official file metadata was checked, and the core catalog, Linux installer, Windows installer, and documentation now use the pinned revision and matching checksum. Future model updates require an intentional metadata change and fresh verification.
+
+## Pinned Gemma artifact repair
+
+The moving Hugging Face `resolve/main` URL changed its underlying Q4_0 file after the first local validation. Miki’s checksum gate correctly rejected the new file because the recorded metadata was stale; this was a truthful safety failure, not a model runtime failure. Official Hugging Face file metadata was checked at pinned revision `858dcdf955fb1b5a43ed2301aea00362fc443a5c`, and the catalog, Linux installer, Windows installer, and guide were updated together to 2,841,481,184 bytes and SHA-256 `8e30dff3ac4c8434c49a7036fa15564bdbb6044e42bf04550bf1a096ad7e6a52`. The repaired provisioner accepted the existing verified file without downloading it again, and a fresh llama.cpp server returned the exact `PINNED_GEMMA_OK` response.

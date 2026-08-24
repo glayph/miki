@@ -27,9 +27,9 @@ const GEMMA_4_E2B_Q4_0: LocalModelCatalogEntry = {
   model_name: "llama.cpp/gemma-4-E2B-it-Q4_0",
   provider: "llama.cpp",
   filename: "gemma-4-E2B-it-Q4_0.gguf",
-  url: "https://huggingface.co/ggml-org/gemma-4-E2B-it-GGUF/resolve/main/gemma-4-E2B-it-Q4_0.gguf?download=true",
-  sha256: "eff5313720ed419c369e56a37e6b617f9e4078821d070b16adeb5d723021e6bd",
-  bytes: 2_843_934_688,
+  url: "https://huggingface.co/ggml-org/gemma-4-E2B-it-GGUF/resolve/858dcdf955fb1b5a43ed2301aea00362fc443a5c/gemma-4-E2B-it-Q4_0.gguf?download=true",
+  sha256: "8e30dff3ac4c8434c49a7036fa15564bdbb6044e42bf04550bf1a096ad7e6a52",
+  bytes: 2_841_481_184,
   description: "Official Gemma 4 E2B instruction model in GGUF Q4_0 format.",
 };
 

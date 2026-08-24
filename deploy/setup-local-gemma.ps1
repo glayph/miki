@@ -5,9 +5,9 @@ $DataHome = if ($env:LOCALAPPDATA) { Join-Path $env:LOCALAPPDATA "Miki" } else {
 $ModelDir = if ($env:MIKI_LOCAL_MODEL_DIR) { $env:MIKI_LOCAL_MODEL_DIR } else { Join-Path $DataHome "models" }
 $ModelPath = Join-Path $ModelDir "gemma-4-E2B-it-Q4_0.gguf"
 $PartPath = "$ModelPath.$PID.part"
-$ModelUrl = "https://huggingface.co/ggml-org/gemma-4-E2B-it-GGUF/resolve/main/gemma-4-E2B-it-Q4_0.gguf?download=true"
-$ExpectedSha256 = "EFF5313720ED419C369E56A37E6B617F9E4078821D070B16ADEB5D723021E6BD"
-$ExpectedBytes = 2843934688
+$ModelUrl = "https://huggingface.co/ggml-org/gemma-4-E2B-it-GGUF/resolve/858dcdf955fb1b5a43ed2301aea00362fc443a5c/gemma-4-E2B-it-Q4_0.gguf?download=true"
+$ExpectedSha256 = "8E30DFF3AC4C8434C49A7036FA15564BDBB6044E42BF04550BF1A096AD7E6A52"
+$ExpectedBytes = 2841481184
 
 New-Item -ItemType Directory -Force -Path $ModelDir | Out-Null
 

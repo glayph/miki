@@ -32,12 +32,12 @@ On Windows PowerShell, use the companion installer:
 .\deploy\setup-local-gemma.ps1
 ```
 
-Both installers download the same allow-listed artifact, verify the expected 2,843,934,688-byte size and SHA-256, persist the local model path, enable startup recovery, and create `config/.env` without writing cloud credentials. Build or use Miki’s bundled headless `llama-server`, download the model into a local model directory, and create `config/.env` from `config/.env.example`:
+Both installers download the same allow-listed artifact from a pinned Hugging Face revision, verify its expected 2,841,481,184-byte size and SHA-256 `8e30dff3ac4c8434c49a7036fa15564bdbb6044e42bf04550bf1a096ad7e6a52`, persist the local model path, enable startup recovery, and create `config/.env` without writing cloud credentials. Build or use Miki’s bundled headless `llama-server`, download the model into a local model directory, and create `config/.env` from `config/.env.example`:
 
 ```bash
 mkdir -p data/models
 curl -L --fail --retry 5 \
-  'https://huggingface.co/ggml-org/gemma-4-E2B-it-GGUF/resolve/main/gemma-4-E2B-it-Q4_0.gguf?download=true' \
+  'https://huggingface.co/ggml-org/gemma-4-E2B-it-GGUF/resolve/858dcdf955fb1b5a43ed2301aea00362fc443a5c/gemma-4-E2B-it-Q4_0.gguf?download=true' \
   -o data/models/gemma-4-E2B-it-Q4_0.gguf
 
 cp config/.env.example config/.env
@@ -82,4 +82,4 @@ The authenticated Miki dashboard visibly showed `llama.cpp/gemma-4-E2B-it-Q4_0` 
 ## References
 
 [1]: https://ai.google.dev/gemma/docs/integrations/llamacpp "Google AI for Developers — Run Gemma with Llama.cpp"
-[2]: https://huggingface.co/ggml-org/gemma-4-E2B-it-GGUF "Hugging Face — ggml-org/gemma-4-E2B-it-GGUF"
+[2]: https://huggingface.co/ggml-org/gemma-4-E2B-it-GGUF/blob/858dcdf955fb1b5a43ed2301aea00362fc443a5c/gemma-4-E2B-it-Q4_0.gguf "Hugging Face — pinned Gemma 4 E2B Q4_0 GGUF metadata"
