@@ -58,12 +58,15 @@ type LocalModelEntry = {
 };
 
 const DEFAULT_BASE_URL = "http://127.0.0.1:39200/v1";
-const DEFAULT_CONTEXT_SIZE = Math.max(
-  8_192,
-  Number.parseInt(
-    (process.env.MIKI_LOCAL_CONTEXT_SIZE || "16384").replace(/_/g, ""),
-    10,
-  ) || 16_384,
+const DEFAULT_CONTEXT_SIZE = Math.min(
+  32_768,
+  Math.max(
+    2_048,
+    Number.parseInt(
+      (process.env.MIKI_LOCAL_CONTEXT_SIZE || "8192").replace(/_/g, ""),
+      10,
+    ) || 8_192,
+  ),
 );
 const LOCAL_RUNTIME_PLATFORM = `${process.platform}-${process.arch}`;
 const LOCAL_RUNTIME_EXECUTABLE =

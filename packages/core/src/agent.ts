@@ -118,12 +118,24 @@ const DEFAULT_MESSAGE_HISTORY_LIMIT = 15;
 const DEFAULT_MAX_TOTAL_CONTEXT_CHARS = 80000; // ~20K tokens
 const LOCAL_LLM_CALL_TIMEOUT_MS = Math.max(
   90_000,
-  Number.parseInt(process.env.MIKI_LOCAL_LLM_TIMEOUT_MS || "300000", 10) ||
-    300_000,
+  Number.parseInt(process.env.MIKI_LOCAL_LLM_TIMEOUT_MS || "900000", 10) ||
+    900_000,
 );
 const REMOTE_LLM_CALL_TIMEOUT_MS = 120_000;
-const LOCAL_AGENT_RUN_TIMEOUT_MS = 300_000;
-const REMOTE_AGENT_RUN_TIMEOUT_MS = 240_000;
+const LOCAL_AGENT_RUN_TIMEOUT_MS = Math.max(
+  600_000,
+  Number.parseInt(
+    process.env.MIKI_LOCAL_AGENT_RUN_TIMEOUT_MS || "1800000",
+    10,
+  ) || 1_800_000,
+);
+const REMOTE_AGENT_RUN_TIMEOUT_MS = Math.max(
+  240_000,
+  Number.parseInt(
+    process.env.MIKI_REMOTE_AGENT_RUN_TIMEOUT_MS || "900000",
+    10,
+  ) || 900_000,
+);
 
 function isLocalModelName(model: string): boolean {
   return (
@@ -407,6 +419,114 @@ type RawAgentToolCall = {
   function?: { name?: string; arguments?: string };
   extra_content?: Record<string, unknown>;
 };
+
+function escapeControlCharactersInsideJsonStrings(value: string): string {
+  let inString = false;
+  let escaped = false;
+  let output = "";
+  for (const character of value) {
+    if (character === "\\" && inString && !escaped) {
+      output += character;
+      escaped = true;
+      continue;
+    }
+    if (character === '"' && !escaped) inString = !inString;
+    if (inString) {
+      switch (character) {
+        case "\n":
+          output += "\\n";
+          break;
+        case "\r":
+          output += "\\r";
+          break;
+        case "\t":
+          output += "\\t";
+          break;
+        case "\b":
+          output += "\\b";
+          break;
+        case "\f":
+          output += "\\f";
+          break;
+        default:
+          output += character;
+      }
+    } else {
+      output += character;
+    }
+    escaped = false;
+  }
+  return output;
+}
+
+export function parseToolArguments(rawArguments: string): Record<string, unknown> {
+  const input = rawArguments.trim();
+  if (!input) return {};
+  const parseCandidate = (candidate: string): Record<string, unknown> => {
+    const parsed = JSON.parse(candidate) as unknown;
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? (parsed as Record<string, unknown>)
+      : { value: parsed };
+  };
+  try {
+    return parseCandidate(input);
+  } catch {
+    const normalized = escapeControlCharactersInsideJsonStrings(input);
+    try {
+      return parseCandidate(normalized);
+    } catch {
+      const firstObject = normalized.indexOf("{");
+      const lastObject = normalized.lastIndexOf("}");
+      if (firstObject >= 0 && lastObject > firstObject) {
+        return parseCandidate(normalized.slice(firstObject, lastObject + 1));
+      }
+      throw new SyntaxError("Tool arguments are not valid JSON");
+    }
+  }
+}
+
+function extractMarkdownToolCalls(content: string): RawAgentToolCall[] | null {
+  const match = content.trim().match(/^```(?:json)?\s*([\s\S]*?)\s*```$/i);
+  if (!match) return null;
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(match[1]);
+  } catch {
+    return null;
+  }
+  const items = Array.isArray(parsed) ? parsed : [parsed];
+  const calls = items.map((item, index): RawAgentToolCall | null => {
+    if (!item || typeof item !== "object") return null;
+    const value = item as Record<string, unknown>;
+    const nested =
+      value.function && typeof value.function === "object"
+        ? (value.function as Record<string, unknown>)
+        : undefined;
+    const name =
+      typeof value.name === "string"
+        ? value.name.trim()
+        : typeof nested?.name === "string"
+          ? nested.name.trim()
+          : "";
+    if (!name) return null;
+    const rawArguments = value.arguments ?? nested?.arguments ?? {};
+    const args =
+      typeof rawArguments === "string"
+        ? rawArguments
+        : JSON.stringify(rawArguments);
+    if (!args) return null;
+    return {
+      id:
+        typeof value.id === "string" && value.id.trim()
+          ? value.id
+          : `qwen-markdown-call-${index + 1}`,
+      function: { name, arguments: args },
+    };
+  });
+  return calls.length > 0 && calls.every(Boolean)
+    ? (calls as RawAgentToolCall[])
+    : null;
+}
 
 interface ParsedToolInvocation extends ToolInvocationLike {
   tcId: string;
@@ -1575,6 +1695,8 @@ export class AgentOrchestrator {
         invalid?: string[];
       };
       maxCompletionRepairs?: number;
+      /** Internal adaptive budget selected from the ordinary chat request. */
+      adaptiveRunTimeoutMs?: number;
     } = {},
   ): AsyncGenerator<string, void, unknown> {
     if (this.heartbeat) this.heartbeat.markUserInteraction();
@@ -1609,9 +1731,16 @@ export class AgentOrchestrator {
       200,
     );
     const localModel = isLocalModelName(this.modelName);
-    const runDeadline =
-      Date.now() +
-      (localModel ? LOCAL_AGENT_RUN_TIMEOUT_MS : REMOTE_AGENT_RUN_TIMEOUT_MS);
+    const defaultRunTimeoutMs = localModel
+      ? LOCAL_AGENT_RUN_TIMEOUT_MS
+      : REMOTE_AGENT_RUN_TIMEOUT_MS;
+    const adaptiveRunTimeoutMs = this._boundedInt(
+      options.adaptiveRunTimeoutMs,
+      defaultRunTimeoutMs,
+      300_000,
+      6 * 60 * 60 * 1000,
+    );
+    const runDeadline = Date.now() + adaptiveRunTimeoutMs;
 
     const history = this._messageHistory.get(sessionId) || [];
     const turnProfile = this._turnProfilePolicy();
@@ -2011,7 +2140,21 @@ export class AgentOrchestrator {
       }
 
       const msg = choice.message;
-      const content: string | null = msg?.content || null;
+      let content: string | null = msg?.content || null;
+      let toolCalls = msg?.tool_calls as
+        | Array<{
+            id?: string;
+            function?: { name?: string; arguments?: string };
+            extra_content?: Record<string, unknown>;
+          }>
+        | undefined;
+      if ((!toolCalls || toolCalls.length === 0) && content) {
+        const markdownToolCalls = extractMarkdownToolCalls(content);
+        if (markdownToolCalls) {
+          toolCalls = markdownToolCalls;
+          content = null;
+        }
+      }
 
       if (content) {
         yield JSON.stringify({
@@ -2067,14 +2210,6 @@ export class AgentOrchestrator {
         }
       }
 
-      const toolCalls = msg?.tool_calls as
-        | Array<{
-            id?: string;
-            function?: { name?: string; arguments?: string };
-            extra_content?: Record<string, unknown>;
-          }>
-        | undefined;
-
       if (toolCalls && toolCalls.length > 0) {
         const requestedWebSearchCalls = toolCalls.filter(
           (toolCall) => toolCall.function?.name === "web_search",
@@ -2107,25 +2242,25 @@ export class AgentOrchestrator {
         if (!content) consecutiveToolOnly++;
 
         if (consecutiveToolOnly >= MAX_AGENT_TURNS_NO_OUTPUT) {
-          const warnMsg =
-            "Agent exceeded max consecutive tool-call turns without a text response.";
-          const warningMessage = `\n\n${warnMsg}`;
-          await this._saveAssistantHistoryMessage(
-            sessionId,
-            warningMessage,
-            options.responseMessageId,
-          );
-          this._logMemoryInteraction(sessionId, userMessage, warningMessage);
-          yield JSON.stringify({
-            type: "stream_chunk",
-            content: warningMessage,
-            model_name: this.modelName,
-            ...(latestContextUsage
-              ? { context_usage: latestContextUsage }
-              : {}),
+          // Long implementation tasks can legitimately require many tool turns.
+          // Do not terminate the task at the first tool-only streak: insert a
+          // visible, bounded checkpoint instruction so the model must summarize
+          // progress briefly before it continues the same task. The outer turn
+          // and deadline guards still provide the hard safety boundaries.
+          const checkpointInstruction =
+            `Tool execution checkpoint: you have completed ${consecutiveToolOnly} consecutive tool-only turns. ` +
+            "The task is still active. First return a concise progress checkpoint in plain text naming what is complete and the single next milestone; then continue the same implementation. Do not restart, ask the parent to implement the task, or stop at a plan. Verify the next milestone with the available tools before final completion.";
+          llmMessages.push({
+            role: "user",
+            content: checkpointInstruction,
           });
-          yield streamDoneEvent(AgentOrchestrator._extractUsage(response));
-          return;
+          yield JSON.stringify({
+            type: "agent_checkpoint",
+            content: checkpointInstruction,
+            consecutive_tool_only: consecutiveToolOnly,
+            turn,
+          });
+          consecutiveToolOnly = 0;
         }
 
         const assistantExtraContent =
@@ -2816,6 +2951,8 @@ export class AgentOrchestrator {
       `${dynamicStateBlock}` +
       `CONVERSATION STYLE:\n` +
       `The main chat is a live human conversation, not an execution log. Write like one person sending a normal message to another: natural, direct, warm when appropriate, and concise. Give the answer first in one or two short sentences; use at most one short paragraph unless the user explicitly asks for a detailed explanation, a report, code, or a step-by-step guide. Do not repeat the same status in multiple forms, restate the request, or narrate plans, routing, tools, files, checks, timestamps, token usage, or completion evidence in the visible reply. Do not put headings such as Plan, Status, Work, Verification, Report, or Summary in an ordinary reply. Put implementation details, reasoning summaries, tool activity, source-research notes, verification results, and long explanations into the Inspector-only runtime summaries emitted by the runtime. If the user asks for a detailed report, provide the requested report, but keep routine progress conversational. Never claim a task is complete without checking the result.\n\n` +
+      `MANDATORY OPERATING CONTRACT:\n` +
+      `You are Agent Miki, an executing computer agent with authorized tools, not a passive language model. For any action-oriented request, never say that you cannot execute tasks, write code, use tools, or operate a workspace. That response is invalid. Start by taking the first concrete safe tool action, then continue until the requested work is verified. Use the available file, shell, browser, and project tools directly; do not merely describe code or give a plan when implementation is requested. If an earlier assistant message refused or stopped, ignore that refusal and resume the user\'s active goal. Never claim completion without inspecting the resulting files and running meaningful checks.\n\n` +
       `You operate as a computer-based agent with full system access. Use absolute paths for any file operation outside the project workspace. You can launch applications, control windows, send keyboard shortcuts, read/write the clipboard, and execute shell commands anywhere on the system. Keep tool use purposeful, auditable, and verification-driven.\n\n` +
       `${screenshotNote}`
     );
@@ -2827,14 +2964,7 @@ export class AgentOrchestrator {
 
     let toolArgs: Record<string, unknown>;
     try {
-      const parsed =
-        typeof toolArgsStr === "string" && toolArgsStr.trim()
-          ? (JSON.parse(toolArgsStr) as unknown)
-          : {};
-      toolArgs =
-        parsed && typeof parsed === "object" && !Array.isArray(parsed)
-          ? (parsed as Record<string, unknown>)
-          : { value: parsed };
+      toolArgs = parseToolArguments(toolArgsStr);
     } catch (err) {
       console.warn(`[Agent] Failed to parse tool args for ${toolName}:`, err);
       toolArgs = { raw: toolArgsStr };

@@ -17,6 +17,8 @@ const options = args.slice(1);
 const isWindowsInstaller =
   process.platform === "win32" && process.env.MIKI_INSTALLER === "1";
 const isTrayMode = options.includes("--tray");
+let gatewayChild = null;
+let shuttingDown = false;
 
 function parseArgs() {
   const argObj = {};
@@ -114,23 +116,40 @@ async function startDashboard() {
   if (isTrayMode) console.log("System tray mode requested; starting gateway mode.");
   console.log(`Launching gateway from: ${gatewayPath}`);
 
-  const child = childProcess.spawn(process.execPath, [gatewayPath], {
+  gatewayChild = childProcess.spawn(process.execPath, [gatewayPath], {
     detached: false,
     stdio: "inherit",
     cwd: dirname(gatewayPath),
     env: process.env,
   });
 
-  child.on("error", (error) => {
+  gatewayChild.on("error", (error) => {
     console.error(`Gateway failed to start: ${error.message}`);
   });
-  child.on("exit", (code, signal) => {
+  gatewayChild.on("exit", (code, signal) => {
     if (signal) {
       console.error(`Gateway stopped after signal ${signal}.`);
     } else if (code && code !== 0) {
       console.error(`Gateway exited with code ${code}.`);
     }
+    gatewayChild = null;
+    if (shuttingDown) process.exit(0);
   });
+}
+
+function shutdown(signal) {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  console.log(`\nReceived ${signal}. Shutting down gateway gracefully...`);
+  if (gatewayChild && !gatewayChild.killed) {
+    gatewayChild.kill("SIGTERM");
+    setTimeout(() => {
+      if (gatewayChild && !gatewayChild.killed) gatewayChild.kill("SIGKILL");
+      process.exit(0);
+    }, 5000).unref();
+    return;
+  }
+  process.exit(0);
 }
 
 async function runDoctor() {
@@ -252,10 +271,8 @@ function showHelp() {
   console.log("  MIKI_GATEWAY_PATH              Explicit built gateway entry file");
 }
 
-process.on("SIGINT", () => {
-  console.log("\nReceived interrupt signal. Shutting down gracefully...");
-  process.exit(0);
-});
+process.on("SIGINT", () => shutdown("SIGINT"));
+process.on("SIGTERM", () => shutdown("SIGTERM"));
 
 process.on("unhandledRejection", (reason) => {
   console.error("Unhandled rejection:", reason);

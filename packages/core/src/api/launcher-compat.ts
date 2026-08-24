@@ -59,6 +59,7 @@ import {
   resolveConfiguredSecret,
   setEnvSecret,
   settings,
+  DEFAULT_LOCAL_GEMMA_MODEL,
   validateRuntimeConfig,
   isValidCidr,
   normalizeAllowedCidrs,
@@ -2665,7 +2666,10 @@ async function autoInstallConfiguredLocalModel(
   if (process.env.MIKI_AUTO_INSTALL_LOCAL_MODEL !== "1") return;
   if (!/^llama\.cpp\//i.test(settings.defaultModel)) return;
   const configuredPath =
-    process.env.MIKI_LOCAL_MODEL_PATH || process.env.MIKI_GEMMA_MODEL_PATH;
+    process.env.MIKI_LOCAL_MODEL_PATH ||
+    (settings.defaultModel === DEFAULT_LOCAL_GEMMA_MODEL
+      ? process.env.MIKI_GEMMA_MODEL_PATH
+      : undefined);
   if (configuredPath && fs.existsSync(configuredPath)) return;
   try {
     const installed = await installLocalModel(settings.defaultModel, {
@@ -2673,7 +2677,11 @@ async function autoInstallConfiguredLocalModel(
       configDir: paths.configDir,
     });
     process.env.MIKI_LOCAL_MODEL_PATH = installed.path;
-    process.env.MIKI_GEMMA_MODEL_PATH = installed.path;
+    if (installed.catalog.model_name === DEFAULT_LOCAL_GEMMA_MODEL) {
+      process.env.MIKI_GEMMA_MODEL_PATH = installed.path;
+    } else {
+      delete process.env.MIKI_GEMMA_MODEL_PATH;
+    }
     console.info(
       `[Launcher] Auto-installed and verified local model ${installed.catalog.id}.`,
     );

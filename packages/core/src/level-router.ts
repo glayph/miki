@@ -22,9 +22,20 @@ export interface MikiGoalRequest {
   sessionId?: string;
 }
 
+export interface AdaptiveExecutionPlan {
+  level: MikiTaskLevel;
+  estimatedMinutes: number;
+  maxRunMinutes: number;
+  milestoneCount: number;
+  checkpointEveryTurns: number;
+  sameContextContinuation: boolean;
+  rationale: string;
+}
+
 export interface MikiLevelRunResult {
   ok: boolean;
   level: MikiTaskLevel;
+  plan: AdaptiveExecutionPlan;
   goal: string;
   sessionId: string;
   response: string;
@@ -36,10 +47,13 @@ export interface MikiLevelRunResult {
 const LEVEL_PATTERNS: Array<[MikiTaskLevel, RegExp]> = [
   ["turbo", /\bturbo(?:[- ]level)?\b|failure injection|debug lfs/i],
   ["max", /\bmax(?:[- ]level)?\b|\blfs\b|large file storage/i],
-  ["extra", /\bextra(?:[- ]level)?\b|polished web app|web app with login/i],
-  ["high", /\bhigh(?:[- ]level)?\b|deep research|multi-step/i],
-  ["medium", /\bmedium(?:[- ]level)?\b|build|implement|integrate/i],
-  ["low", /\blow(?:[- ]level)?\b|file|shell|simple automation/i],
+  [
+    "extra",
+    /\bextra(?:[- ]level)?\b|polished web app|web app with login|full[- ]stack|authenticated website/i,
+  ],
+  ["high", /\bhigh(?:[- ]level)?\b|deep research|multi-step|investigate|migrate/i],
+  ["medium", /\bmedium(?:[- ]level)?\b|\bbuild\b|\bimplement\b|integrate|deploy|project|application/i],
+  ["low", /\blow(?:[- ]level)?\b|\bfile\b|shell|simple automation|run a test/i],
   ["adaptive", /adaptive|decide|choose|compare|recommend/i],
 ];
 
@@ -58,20 +72,133 @@ export function resolveMikiTaskLevel(
   return requested ?? inferMikiTaskLevel(goal);
 }
 
+const BASE_ADAPTIVE_PLANS: Record<
+  MikiTaskLevel,
+  Omit<AdaptiveExecutionPlan, "level" | "rationale">
+> = {
+  normal: {
+    estimatedMinutes: 1,
+    maxRunMinutes: 5,
+    milestoneCount: 1,
+    checkpointEveryTurns: 8,
+    sameContextContinuation: true,
+  },
+  adaptive: {
+    estimatedMinutes: 5,
+    maxRunMinutes: 15,
+    milestoneCount: 2,
+    checkpointEveryTurns: 8,
+    sameContextContinuation: true,
+  },
+  low: {
+    estimatedMinutes: 10,
+    maxRunMinutes: 20,
+    milestoneCount: 2,
+    checkpointEveryTurns: 10,
+    sameContextContinuation: true,
+  },
+  medium: {
+    estimatedMinutes: 30,
+    maxRunMinutes: 60,
+    milestoneCount: 4,
+    checkpointEveryTurns: 12,
+    sameContextContinuation: true,
+  },
+  high: {
+    estimatedMinutes: 60,
+    maxRunMinutes: 120,
+    milestoneCount: 6,
+    checkpointEveryTurns: 10,
+    sameContextContinuation: true,
+  },
+  extra: {
+    estimatedMinutes: 120,
+    maxRunMinutes: 240,
+    milestoneCount: 8,
+    checkpointEveryTurns: 8,
+    sameContextContinuation: true,
+  },
+  max: {
+    estimatedMinutes: 180,
+    maxRunMinutes: 360,
+    milestoneCount: 10,
+    checkpointEveryTurns: 8,
+    sameContextContinuation: true,
+  },
+  turbo: {
+    estimatedMinutes: 90,
+    maxRunMinutes: 180,
+    milestoneCount: 8,
+    checkpointEveryTurns: 8,
+    sameContextContinuation: true,
+  },
+};
+
+/**
+ * Selects an internal work budget from the request itself. This is deliberately
+ * not a UI-facing Goal setting: ordinary chat calls this planner automatically.
+ */
+export function buildAdaptiveExecutionPlan(
+  goal: string,
+  requested?: MikiTaskLevel,
+): AdaptiveExecutionPlan {
+  const level = resolveMikiTaskLevel(goal, requested);
+  const base = BASE_ADAPTIVE_PLANS[level];
+  const normalized = goal.trim();
+  const words = normalized ? normalized.split(/\s+/).length : 0;
+  const signals = [
+    /\b(and|then|after|also|with|including)\b/i.test(normalized),
+    /\b(test|verify|validate|document|screenshot|archive|release)\b/i.test(normalized),
+    /\b(auth|login|database|backend|frontend|api|deploy|github|linux|windows)\b/i.test(normalized),
+    words > 80,
+  ].filter(Boolean).length;
+  const complexityMultiplier = Math.min(1.75, 1 + signals * 0.15);
+  const estimatedMinutes = Math.max(
+    base.estimatedMinutes,
+    Math.ceil(base.estimatedMinutes * complexityMultiplier),
+  );
+  const maxRunMinutes = Math.max(
+    base.maxRunMinutes,
+    Math.ceil(estimatedMinutes * 1.75),
+  );
+  const milestoneCount = Math.max(
+    base.milestoneCount,
+    base.milestoneCount + Math.min(3, Math.floor(signals / 2)),
+  );
+  const rationale =
+    signals === 0
+      ? `Selected ${level} from the request language and scope.`
+      : `Selected ${level}; added ${signals} complexity signal${signals === 1 ? "" : "s"} for dependencies, verification, or scope breadth.`;
+  return {
+    level,
+    estimatedMinutes,
+    maxRunMinutes,
+    milestoneCount,
+    checkpointEveryTurns: base.checkpointEveryTurns,
+    sameContextContinuation: true,
+    rationale,
+  };
+}
+
 export function buildMikiExecutionPrompt(
   goal: string,
-  level: MikiTaskLevel,
+  level?: MikiTaskLevel,
 ): string {
+  const plan = buildAdaptiveExecutionPlan(goal, level);
   return [
     "You are Agent Miki. Execute the user's goal yourself through your registered tools and runtime.",
-    `Execution level: ${level}.`,
-    "Do not merely explain how the user could do it. Plan the work, perform the permitted steps, verify the result, and report what changed.",
+    `Adaptive execution plan: level=${plan.level}; estimated work=${plan.estimatedMinutes} minutes; safe run budget=${plan.maxRunMinutes} minutes; milestones=${plan.milestoneCount}; checkpoint every ${plan.checkpointEveryTurns} tool turns.`,
+    `Execution level: ${plan.level}.`,
+    plan.rationale,
+    "This plan was selected automatically from ordinary chat. Never ask the user to create or choose a Goal, level, duration, milestone, or checkpoint.",
+    "Do not merely explain how the user could do it. Plan the work internally, perform the permitted steps, verify the result, and report what changed.",
+    "Work in bounded milestones. At every checkpoint, preserve useful state and continue in this same conversation/session automatically; do not restart completed work or ask for confirmation unless an approval policy requires it.",
     "Use the lowest-cost capable route first: deterministic tools or a local model before a remote provider. Do not invent credentials, model IDs, files, or successful results.",
     "If a required capability, permission, credential, dependency, or user approval is missing, stop at that boundary and report the exact limitation, cause, enabling change, and next safe action.",
     "Record failures and useful improvements in the durable Report/capability workflow when that tool is available.",
     "Never silently perform destructive or externally visible actions without the configured approval policy.",
     "",
-    `User goal:\n${goal.trim()}`,
+    `User request:\n${goal.trim()}`,
   ].join("\n");
 }
 
@@ -118,8 +245,7 @@ export function shouldTreatOrdinaryMessageAsGoal(message: string): boolean {
 export function prepareOrdinaryChatMessage(message: string): string {
   const normalized = message.trim();
   if (!shouldTreatOrdinaryMessageAsGoal(normalized)) return message;
-  const level = inferMikiTaskLevel(normalized);
-  return buildMikiExecutionPrompt(normalized, level);
+  return buildMikiExecutionPrompt(normalized);
 }
 
 export async function executeGoalThroughMiki(
@@ -129,7 +255,8 @@ export async function executeGoalThroughMiki(
 ): Promise<MikiLevelRunResult> {
   const goal = request.goal.trim();
   if (!goal) throw new Error("goal is required");
-  const level = resolveMikiTaskLevel(goal, request.level);
+  const plan = buildAdaptiveExecutionPlan(goal, request.level);
+  const level = plan.level;
   const sessionId = request.sessionId?.trim() || `miki-level:${Date.now()}`;
   const startedAt = new Date().toISOString();
   try {
@@ -138,12 +265,13 @@ export async function executeGoalThroughMiki(
       sessionId,
       buildMikiExecutionPrompt(goal, level),
       onText ?? (() => undefined),
-      24000,
+      Math.max(24000, plan.maxRunMinutes * 60 * 1000),
     );
     const finishedAt = new Date().toISOString();
     await persistLevelRun({
       ok: true,
       level,
+      plan,
       goal: redactJournalText(goal),
       sessionId,
       response: redactJournalText(response),
@@ -153,6 +281,7 @@ export async function executeGoalThroughMiki(
     return {
       ok: true,
       level,
+      plan,
       goal,
       sessionId,
       response,
@@ -165,6 +294,7 @@ export async function executeGoalThroughMiki(
     await persistLevelRun({
       ok: false,
       level,
+      plan,
       goal: redactJournalText(goal),
       sessionId,
       response: "",
@@ -175,6 +305,7 @@ export async function executeGoalThroughMiki(
     return {
       ok: false,
       level,
+      plan,
       goal,
       sessionId,
       response: "",

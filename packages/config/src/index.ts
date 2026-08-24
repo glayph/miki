@@ -106,8 +106,10 @@ export interface SecretStatusItem {
   migrated?: boolean;
 }
 
-// Local Gemma is the zero-API-cost default. Cloud Gemini remains available
-// only when explicitly selected through MIKI_MODEL/MIKI_PROVIDER.
+// Local Qwen Coder is the zero-API-cost default. Gemma and cloud Gemini
+// remain available only when explicitly selected through MIKI_MODEL/MIKI_PROVIDER.
+export const DEFAULT_LOCAL_CODING_MODEL =
+  "llama.cpp/qwen2.5-coder-3b-instruct-q5_K_M";
 export const DEFAULT_LOCAL_GEMMA_MODEL = "llama.cpp/gemma-4-E2B-it-Q4_0";
 export const DEFAULT_LOCAL_GEMMA_PROVIDER = "llama.cpp";
 export const DEFAULT_GEMINI_MODEL = "gemini/gemini-3.5-flash-lite";
@@ -119,6 +121,7 @@ const SECRET_KEYS = [
   "GEMINI_API_KEY",
   "GOOGLE_API_KEY",
   "OPENROUTER_API_KEY",
+  "OPENCODE_API_KEY",
   "MIKI_API_KEY",
   "TELEGRAM_BOT_TOKEN",
   "DISCORD_BOT_TOKEN",
@@ -136,21 +139,23 @@ export const settings: RuntimeConfig & {
   coreHost: string;
 } = {
   dataDir: process.env.MIKI_DATA_DIR || "./data",
-  // Local Gemma is the default; MIKI_MODEL remains an intentional override
-  // for a different local or remote provider.
-  model: process.env.MIKI_MODEL || DEFAULT_LOCAL_GEMMA_MODEL,
-  defaultModel: process.env.MIKI_MODEL || DEFAULT_LOCAL_GEMMA_MODEL,
+  // Local Qwen Coder is the default; MIKI_MODEL remains an intentional
+  // override for a different local or remote provider.
+  model: process.env.MIKI_MODEL || DEFAULT_LOCAL_CODING_MODEL,
+  defaultModel: process.env.MIKI_MODEL || DEFAULT_LOCAL_CODING_MODEL,
   temperature: 0.2,
   defaultTemperature: Number(process.env.DEFAULT_TEMPERATURE || 0.7) || 0.7,
   maxTokens: 4096,
   defaultMaxTokens: Number(process.env.DEFAULT_MAX_TOKENS || 4096) || 4096,
-  provider: process.env.MIKI_PROVIDER || DEFAULT_LOCAL_GEMMA_PROVIDER,
+  provider: process.env.MIKI_PROVIDER || "llama.cpp",
   corePort: Number(process.env.CORE_PORT || 8000) || 8000,
   coreHost: process.env.CORE_HOST || "127.0.0.1",
   getSupportedModels() {
     return [
+      DEFAULT_LOCAL_CODING_MODEL,
       DEFAULT_LOCAL_GEMMA_MODEL,
       DEFAULT_GEMINI_MODEL,
+      "opencode/mimo-v2.5-free",
       "gemini/gemini-3.6-flash",
       "gemini/gemini-3.5-flash",
       "gemini/gemini-3.5-flash-lite",

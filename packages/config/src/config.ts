@@ -7,6 +7,7 @@ import { resolveConfiguredSecret, setConfiguredSecret } from "./user-config.js";
 import { readMikiEnv } from "./env-compat.js";
 
 const candidates = [
+  path.resolve(process.cwd(), "config", ".env"),
   path.resolve(process.cwd(), ".env"),
   path.resolve(process.cwd(), "..", ".env"),
   path.resolve(process.cwd(), "..", "..", ".env"),

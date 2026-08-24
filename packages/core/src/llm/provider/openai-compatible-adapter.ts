@@ -38,12 +38,12 @@ function localMaxTokens(): number {
 function defaultTimeoutMs(provider: DirectProviderConfig): number {
   if (provider.id === "llama.cpp") {
     const configured = Number.parseInt(
-      process.env.MIKI_LOCAL_LLM_TIMEOUT_MS || "300000",
+      process.env.MIKI_LOCAL_LLM_TIMEOUT_MS || "900000",
       10,
     );
     return Number.isFinite(configured) && configured >= 90_000
       ? configured
-      : 300_000;
+      : 900_000;
   }
   return 120_000;
 }

@@ -17,7 +17,6 @@ import type { ChatInputDisabledReason } from "@/features/chat/components/chat-co
 import { ChatInspector } from "@/features/chat/components/chat-inspector"
 import { openChatInspectorAtom } from "@/features/chat/components/chat-inspector-store"
 import { ModelSelector } from "@/features/chat/components/model-selector"
-import { PursueGoalPanel } from "@/features/chat/components/pursue-goal-panel"
 import { ChatMessageList } from "@/features/chat/components/workspace/chat-message-list"
 import { Composer } from "@/features/chat/components/workspace/composer"
 import type { WorkspaceStatusPill } from "@/features/chat/components/workspace/types"
@@ -402,7 +401,6 @@ export function ChatPage() {
   >("idle")
   const [voiceElapsedMs, setVoiceElapsedMs] = useState(0)
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
-  const [goalShortcutOpen, setGoalShortcutOpen] = useState(false)
   const hasLoadedSessionsRef = useRef(false)
   const isMobile = useIsMobile()
   const openInspector = useSetAtom(openChatInspectorAtom)
@@ -843,12 +841,6 @@ export function ChatPage() {
       return
     }
 
-    if (!editingMessageId && input.trim().toLowerCase() === "/goal") {
-      setInput("")
-      setAttachments([])
-      setGoalShortcutOpen(true)
-      return
-    }
     if (editingMessageId) {
       if (
         await editMessage({
@@ -1115,12 +1107,7 @@ export function ChatPage() {
           />
         }
         composer={
-          <>
-            <PursueGoalPanel
-              autoOpen={goalShortcutOpen}
-              onAutoOpenConsumed={() => setGoalShortcutOpen(false)}
-            />
-            <Composer
+          <Composer
               input={input}
               attachments={attachments}
               onInputChange={setInput}
@@ -1139,8 +1126,7 @@ export function ChatPage() {
               }
               canSend={canSubmit && voiceState === "idle"}
               contextUsage={contextUsage}
-            />
-          </>
+          />
         }
       />
 

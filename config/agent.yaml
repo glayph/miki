@@ -106,7 +106,7 @@ agents:
     split_on_marker: true
     max_tokens: 16384
     context_window: 0
-    max_tool_iterations: 40
+    max_tool_iterations: 120
     summarize_message_threshold: 20
     summarize_token_percent: 75
     tool_feedback:

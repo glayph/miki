@@ -22,6 +22,18 @@ export interface LocalModelInstallResult {
   bytes: number;
 }
 
+const QWEN_2_5_CODER_3B_Q5_K_M: LocalModelCatalogEntry = {
+  id: "qwen2.5-coder-3b-instruct-q5_K_M",
+  model_name: "llama.cpp/qwen2.5-coder-3b-instruct-q5_K_M",
+  provider: "llama.cpp",
+  filename: "qwen2.5-coder-3b-instruct-q5_k_m.gguf",
+  url: "https://huggingface.co/Qwen/Qwen2.5-Coder-3B-Instruct-GGUF/resolve/f74adce6aa16316c625447af059dbebe4983757c/qwen2.5-coder-3b-instruct-q5_k_m.gguf?download=true",
+  sha256: "eb863f2a1a9b67e33bbf2dad98ea09c03b71c8052aeb4835171cf6f7a7a12db4",
+  bytes: 2_438_740_416,
+  description:
+    "Official Qwen2.5-Coder 3B instruction model in GGUF Q5_K_M format.",
+};
+
 const GEMMA_4_E2B_Q4_0: LocalModelCatalogEntry = {
   id: "gemma-4-E2B-it-Q4_0",
   model_name: "llama.cpp/gemma-4-E2B-it-Q4_0",
@@ -33,7 +45,10 @@ const GEMMA_4_E2B_Q4_0: LocalModelCatalogEntry = {
   description: "Official Gemma 4 E2B instruction model in GGUF Q4_0 format.",
 };
 
-const CATALOG: readonly LocalModelCatalogEntry[] = [GEMMA_4_E2B_Q4_0];
+const CATALOG: readonly LocalModelCatalogEntry[] = [
+  QWEN_2_5_CODER_3B_Q5_K_M,
+  GEMMA_4_E2B_Q4_0,
+];
 
 function stringValue(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
@@ -200,11 +215,25 @@ export async function installLocalModel(
   }
   persistEnvValues(options.configDir, {
     MIKI_LOCAL_MODEL_PATH: modelPath,
-    MIKI_GEMMA_MODEL_PATH: modelPath,
     MIKI_MODEL: catalog.model_name,
     DEFAULT_MODEL: catalog.model_name,
     MIKI_PROVIDER: "llama.cpp",
   });
+  if (catalog.id === GEMMA_4_E2B_Q4_0.id) {
+    persistEnvValues(options.configDir, { MIKI_GEMMA_MODEL_PATH: modelPath });
+  } else if (options.configDir) {
+    const envPath = path.join(path.resolve(options.configDir), ".env");
+    if (fs.existsSync(envPath)) {
+      const cleaned = fs
+        .readFileSync(envPath, "utf8")
+        .split(/\r?\n/)
+        .filter((line) => !line.startsWith("MIKI_GEMMA_MODEL_PATH="));
+      fs.writeFileSync(envPath, `${cleaned.filter(Boolean).join("\n")}\n`, {
+        encoding: "utf8",
+        mode: 0o600,
+      });
+    }
+  }
   return {
     catalog,
     path: modelPath,

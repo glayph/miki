@@ -1,4 +1,6 @@
+import { describe, expect, it, vi } from "vitest";
 import { ConcurrentTaskManager } from "./concurrent-manager.js";
+import { parseToolArguments } from "./agent.js";
 import { TaskQueue } from "./task-queue.js";
 import { CostCalibrator } from "./cost-calibrator.js";
 import { parseCronToNextRun, TaskScheduler } from "./scheduler.js";
@@ -16,6 +18,24 @@ async function waitFor(
   }
   throw new Error("Timed out waiting for condition");
 }
+
+describe("tool argument normalization", () => {
+  it("recovers literal control characters inside JSON strings", () => {
+    const args = parseToolArguments('{"path":"/tmp/first\nsecond"}')
+    expect(args).toEqual({ path: "/tmp/first\nsecond" })
+  })
+
+  it("extracts one bounded JSON object from a wrapped tool payload", () => {
+    const args = parseToolArguments('prefix {"cmd":"printf ok"} suffix')
+    expect(args).toEqual({ cmd: "printf ok" })
+  })
+
+  it("rejects unrecoverable or truncated arguments", () => {
+    expect(() => parseToolArguments('{"path":"/tmp/unfinished')).toThrow(
+      "Tool arguments are not valid JSON",
+    )
+  })
+})
 
 describe("ConcurrentTaskManager", () => {
   it("should start with zero active tasks", () => {
@@ -380,7 +400,7 @@ describe("Scheduler", () => {
 
   it("should fail queued tasks when the executor throws", async () => {
     const queue = new TaskQueue({ maxSize: 10 });
-    const errorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     const scheduler = new TaskScheduler(
       { maxConcurrentTasks: 1, taskQueueSize: 10, schedulerIntervalMs: 5 },
       queue,

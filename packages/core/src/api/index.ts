@@ -47,6 +47,7 @@ import { createSkillsRouter } from "../skill-api.js";
 import { PluginChannelRuntimeManager } from "../plugins/plugin-channel-runtime.js";
 import { summarizeAgentRoute } from "../agent-router.js";
 import {
+  buildAdaptiveExecutionPlan,
   executeGoalThroughMiki,
   prepareOrdinaryChatMessage,
   MIKI_TASK_LEVELS,
@@ -187,6 +188,7 @@ const pendingFeedback = new Map<string, string[]>();
 // Helper function for model switching
 function getProviderForModel(model: string): string {
   if (model.startsWith("openrouter/")) return "OpenRouter";
+  if (model.startsWith("opencode/")) return "OpenCode Zen";
   if (model.startsWith("gemini/") || model.startsWith("google/"))
     return "Google Gemini";
   if (model.startsWith("anthropic/")) return "Anthropic";
@@ -2043,6 +2045,7 @@ mikiWss.on("connection", (ws, req) => {
           media.length > 0
             ? `${effectiveContent}\n\nAttached media:\n${media.join("\n")}`.trim()
             : effectiveContent;
+        const adaptivePlan = buildAdaptiveExecutionPlan(messageForAgent);
         artifactContract = _detectArtifactContract(
           messageForAgent,
           workspaceDir,
@@ -2071,6 +2074,7 @@ mikiWss.on("connection", (ws, req) => {
                   ? _verifyArtifactContract(artifactContract)
                   : { ok: true },
               maxCompletionRepairs: 2,
+              adaptiveRunTimeoutMs: adaptivePlan.maxRunMinutes * 60 * 1000,
             },
           )) {
             let event: Record<string, unknown>;
@@ -3153,11 +3157,15 @@ async function handleChatRequest(req: Request, res: Response): Promise<void> {
   }
   try {
     let fullResponse = "";
-    const messageForMiki = prepareOrdinaryChatMessage(String(message));
+    const rawMessageForMiki = String(message);
+    const adaptivePlan = buildAdaptiveExecutionPlan(rawMessageForMiki);
+    const messageForMiki = prepareOrdinaryChatMessage(rawMessageForMiki);
     await runWithCallOrigin(resolveCallOrigin(req), async () => {
       for await (const chunk of orchestrator.runAgentLoop(
         session_id,
         messageForMiki,
+        undefined,
+        { adaptiveRunTimeoutMs: adaptivePlan.maxRunMinutes * 60 * 1000 },
       )) {
         const data = JSON.parse(chunk);
         if (data.type === "stream_chunk") {

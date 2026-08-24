@@ -915,41 +915,6 @@
       "evidence": "Evidence"
     }
   },
-  "pursueGoal": {
-    "title": "Pursue Goal",
-    "loading": "Loading goal",
-    "noActive": "No active pursue goal",
-    "progress": "Pursue goal progress",
-    "status": {
-      "active": "Active",
-      "pending": "Pending",
-      "completed": "Completed",
-      "blocked": "Blocked",
-      "cancelled": "Cancelled"
-    },
-    "actions": {
-      "complete": "Complete goal",
-      "block": "Block",
-      "cancel": "Cancel goal",
-      "start": "Start"
-    },
-    "fields": {
-      "objective": "Objective",
-      "details": "Details",
-      "steps": "Steps"
-    },
-    "toast": {
-      "loadFailed": "Failed to load goal",
-      "started": "Pursue goal started",
-      "startFailed": "Failed to start goal",
-      "statusUpdated": "Goal {{status}}",
-      "updateFailed": "Failed to update goal"
-    },
-    "statusReason": {
-      "completed": "Marked from launcher",
-      "stopped": "Stopped from launcher"
-    }
-  },
   "systemIndex": {
     "toast": {
       "pathCopied": "Path copied",

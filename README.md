@@ -1,126 +1,67 @@
-# Agent Miki
+# authenticated-blog-app Workflow
 
-**Agent Miki** is a local-first, cross-platform agentic AI workspace for Linux and Windows. It combines a Node.js launcher, a TypeScript agent core, a React dashboard, model and credential management, memory, tools, channels, automations, and a guarded control plane.
+Target: app
+Created: 2026-08-24T18:28:00.289Z
 
-The project is designed to be useful with low-cost or local models first. Cloud providers remain optional and can be configured through the dashboard without placing credentials in source code.
+## Brief
+Build a complete production-style authenticated create-post website with Node.js backend API, React/TypeScript frontend, SQLite database, secure authentication, protected sessions, dashboard, create/edit/delete posts, tests, and source archive.
 
-## What Miki includes
+## Architecture
+Modular vertical-slice architecture with domain, adapter, interface, and verification layers.
 
-| Area | What it provides |
-| --- | --- |
-| Agent workspace | Conversational chat, runs, execution details, artifacts, and Inspector views |
-| Models | Provider catalog, default-model selection, local llama.cpp support, and runtime health |
-| Search | Local-first web search with optional API providers and source citations |
-| Memory | Selective memory, search, reindexing, retrieval traces, and SQLite-backed storage |
-| Tools | Guarded filesystem, shell, browser, web, model, workflow, MCP, and skill capabilities |
-| Channels | Web chat plus configurable channel adapters with allow-lists and runtime probes |
-| Automation | Schedules, workflows, persistent job state, retries, and approval-aware execution |
-| Agent Control | Sanitized state, capability discovery, validated reversible changes, approvals, and an operation journal |
+- ui: User flows, state, responsive layout, and accessibility.
+- api: Backend endpoints, auth boundary, validation, and integration contracts.
+- domain: Core business rules independent from UI and transport.
+- persistence: Data models, migrations, caching, and recovery behavior.
+- tests: Unit, integration, visual, and smoke verification gates.
 
-## Quick start
+## File Tree
+- [must] authenticated-blog-app/README.md - Project overview, setup, and delivery checklist.
+- [must] authenticated-blog-app/docs/architecture.md - Architecture decisions, boundaries, and data flow.
+- [must] authenticated-blog-app/src/index.ts - Main application or library entry point.
+- [must] authenticated-blog-app/src/domain/index.ts - Core domain rules separated from adapters.
+- [should] authenticated-blog-app/src/adapters/index.ts - External service and platform adapter boundary.
+- [must] authenticated-blog-app/tests/smoke.test.ts - End-to-end or integration smoke gate.
+- [must] authenticated-blog-app/scripts/verify.mjs - Portable scaffold verification used by post-generation gates.
+- [must] authenticated-blog-app/package.json - Scripts for build, test, lint, and smoke.
 
-The recommended local workflow is:
+## Milestones
+### Blueprint
+Requirements, architecture, and risk plan are explicit before writing broad code.
+- Extract concrete requirements from the brief and any sketches/assets.
+- Define module boundaries, data flow, and runtime constraints.
+- Choose the smallest vertical slice that proves the architecture.
+- Gate: blueprint review - Requirements and acceptance gates are written down.
 
-```bash
-npm install
-npm run build:all
-npm start
-```
+### Vertical Slice
+A minimal running artifact proves the highest-risk path.
+- Create the workspace and core files.
+- Implement the startup path and one end-to-end user/system workflow.
+- Keep placeholders isolated behind interfaces so later expansion does not require rewrites.
+- Gate: unit tests (node scripts/verify.mjs test) - Core behavior and adapters pass focused tests.
+- Gate: build (node scripts/verify.mjs build) - Production artifact builds without type or bundling errors.
 
-Open the dashboard address printed by the launcher. The usual local address is `http://127.0.0.1:18800`. On first launch, Miki asks you to set a dashboard password.
+### Feature Expansion
+Expected capabilities are added behind the established boundaries.
+- Implement modules in dependency order.
+- Add regression tests next to each module contract.
+- Run smoke checks after each meaningful integration step.
+- Gate: unit tests (node scripts/verify.mjs test) - Core behavior and adapters pass focused tests.
+- Gate: build (node scripts/verify.mjs build) - Production artifact builds without type or bundling errors.
+- Gate: smoke (node scripts/verify.mjs smoke) - Primary user workflow works in runtime.
 
-For development with hot reload, use:
+### Hardening
+The artifact is maintainable, testable, and ready for review.
+- Remove dead paths, insecure defaults, and placeholder behavior.
+- Document setup, limitations, and verification evidence.
+- Run the full gate list from a clean state.
+- Gate: unit tests (node scripts/verify.mjs test) - Core behavior and adapters pass focused tests.
+- Gate: build (node scripts/verify.mjs build) - Production artifact builds without type or bundling errors.
+- Gate: smoke (node scripts/verify.mjs smoke) - Primary user workflow works in runtime.
 
-```bash
-npm run dev
-```
-
-The complete setup guide is available in [`SETUP.md`](SETUP.md). It contains the platform-specific prerequisites, model configuration, voice setup, provider setup, troubleshooting, and release instructions.
-
-## Linux and Windows support
-
-Miki’s application code is cross-platform. Linux and Windows use the same launcher, dashboard, configuration model, and safety boundaries. The local llama.cpp runtime is selected by platform and must be built or supplied with a compatible executable. Answer-model GGUF files are not bundled; configure an operator-provided model path through the dashboard or the documented environment variables.
-
-A conservative native build on Linux can be started with:
-
-```bash
-MIKI_LLAMA_BUILD_JOBS=1 npm run build:all
-```
-
-On Windows, run the commands from PowerShell or a Node.js-compatible terminal after installing the native build prerequisites described in [`SETUP.md`](SETUP.md).
-
-## Agent Control
-
-The **Agent Control** page is available at `/control` and from the dashboard sidebar. It provides a small, typed management surface rather than an unrestricted automation macro.
-
-| Control | Boundary |
-| --- | --- |
-| State and capabilities | Read-only, sanitized, and credential-redacted |
-| Resource profile | Reversible `eco`, `balanced`, or `performance` configuration change |
-| Tool enablement | Enable or disable an existing registered tool through the dashboard controller |
-| Model/runtime health | Inspect registered provider/runtime adapters, including llama.cpp |
-| Runtime reload | Reload supported configuration and report restart requirements |
-| Protected operations | Owner approval, context binding, one-time consumption, and journaled outcome |
-
-Complex or destructive actions are not silently guessed. Arbitrary shell commands, unrestricted filesystem mutation, factory reset, credential deletion, unattended third-party code installation, and generic model downloading remain outside the autonomous control boundary.
-
-The control API is documented in [`docs/agent-control-api.md`](docs/agent-control-api.md). The implementation audit is in [`docs/agent-control-capability-report.md`](docs/agent-control-capability-report.md).
-
-## Low-cost model strategy
-
-Miki works best when a local model or a free/low-cost provider is configured as the default. Local llama.cpp models keep inference on the operator’s machine. Cloud providers can be added later through the Models and Credentials pages. Provider availability depends on the operator’s credentials, network access, quotas, and provider policy.
-
-Do not commit API keys, bot tokens, MCP credentials, model weights, local databases, or runtime logs. Use the dashboard’s secret-aware fields or environment configuration for sensitive values.
-
-## 24/7 operation
-
-For a continuously running installation, keep the launcher under a process supervisor and configure automatic restart after failure. Miki includes readiness commands that can be used by a supervisor or deployment check:
-
-```bash
-npm run runtime:24-7:check
-npm run runtime:24-7
-```
-
-The readiness check confirms that the expected gateway entrypoint and runtime configuration are present. It does not prove that every provider, channel, native runtime, MCP server, or model is available; those dependencies are reported separately by the dashboard and health surfaces.
-
-For detailed Linux/Windows service setup, relocation, native runtimes, voice transcription, and production notes, read [`SETUP.md`](SETUP.md).
-
-## Optional capabilities
-
-Miki supports local-first web search, configurable API search providers, Whisper.cpp-based voice transcription, authenticated MCP, Telegram-style channel administration, skill discovery/import, and persistent approval workflows. Optional capabilities remain disabled or degraded until their runtime, credentials, model, endpoint, or allow-list is explicitly configured.
-
-The project deliberately treats external MCP servers, downloaded skills, native binaries, and model files as untrusted or operator-provided inputs. Installation and side-effectful operations must pass validation and, where required, owner approval.
-
-## Project layout
-
-| Path | Purpose |
-| --- | --- |
-| `packages/core` | Agent orchestration, tools, control plane, channels, security, model/runtime logic, and APIs |
-| `packages/config` | Validated configuration schemas and runtime settings |
-| `packages/gateway` | Gateway process and runtime-facing services |
-| `packages/memory` | SQLite-backed memory and retrieval components |
-| `packages/skills` | Skill metadata, discovery, import, and installation boundaries |
-| `packages/ui/frontend` | React dashboard, routes, API clients, and visual workspace |
-| `scripts` | Development, build, release, verification, and 24/7 readiness commands |
-| `docs` | Architecture audits, control API guidance, and capability reports |
-
-## Useful commands
-
-| Command | Purpose |
-| --- | --- |
-| `npm run dev` | Start the development workflow |
-| `npm run build:all` | Build native/runtime packages and the production dashboard |
-| `npm start` | Start the launcher |
-| `npm run test` | Run workspace tests where configured |
-| `npm run verify` | Run the project verification workflow |
-| `npm run runtime:24-7:check` | Check continuous-runtime readiness |
-| `npm run build:release:linux` | Build the Linux offline release package |
-| `npm run build:release:windows` | Build the Windows release package |
-
-## Verification notes
-
-The repository contains focused tests for control capability boundaries, secret redaction, approval gating, operation routing, and deterministic management intents. A full build, native runtime probe, provider probe, and browser pass should be run on the target Linux or Windows machine before production deployment because those checks depend on local compilers, binaries, model files, credentials, and operating-system services.
-
-## License
-
-Agent Miki is released under the MIT License. Third-party providers, model weights, native runtimes, skills, and external MCP servers may have separate licenses and terms. Review those terms before distribution or deployment.
+## Review Loop
+- Plan the smallest next change.
+- Edit only the files needed for that change.
+- Run the narrowest meaningful gate.
+- Broaden tests/build/smoke before declaring the milestone done.
+- Record evidence and remaining risk.

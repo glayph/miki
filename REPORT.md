@@ -84,3 +84,59 @@ The first Windows platform job correctly checked out Git LFS and parsed `deploy/
 
 The first Windows workflow repair built `@miki/config` but core then exposed the next missing workspace dependency, `@miki/installer`. The Windows job was expanded to build config, installer, skills, memory, and core in the same dependency order as the Linux build. Run [#32749870466](https://github.com/glayph/miki/actions/runs/32749870466) passed both `linux-build-test` and `windows-platform-check`, including real LFS checkout, PowerShell parsing, Linux full validation, and Windows workspace compilation.
 This keeps Windows validation deterministic without downloading the large local model.
+
+## Qwen Extra-level execution attempt — stalled before tool execution
+
+During the Extra-level delegated website run, the local `Qwen2.5-Coder-3B-Instruct Q5_K_M` runtime accepted the request after the context and timeout repairs, but the request remained in llama.cpp processing with `n_prompt_tokens` rising to approximately 4,568 and `n_decoded` still at 0 for several minutes. Miki’s dashboard remained on a spinning Start state, no active agent-run record or website project files appeared, and the core log contained no tool execution event. This is a real execution failure, not evidence of website completion.
+
+**What failed:** the Extra-level goal did not reach an actionable tool call or create any delegated website files. **Why:** on this CPU-only host, the long orchestration prompt is too slow or stalls during prompt evaluation even after increasing the local context to 8,192 and request timeout to 900,000 ms. **Change that can enable the capability:** stop the stuck request safely and retry the same Miki goal through the user-authorized low-cost Gemini fallback, while keeping Qwen as the preferred local default for ordinary work. **Improvement:** the parent agent will change only Miki’s provider/runtime configuration and continue observing Miki; it will not author the target website. The fallback attempt and its final evidence must be recorded here separately.
+
+## Gemini fallback execution attempt — scaffolded but incomplete
+
+After the Qwen request stalled, Miki was restarted with the user-authorized Gemini fallback and `gemini/gemini-3.5-flash-lite` was selected in the dashboard. Gemini was responsive and Miki created an `authenticated-blog-app` directory with a README, architecture note, package metadata, server/database files, and a smoke-test scaffold. However, the run then stopped with the dashboard message **"Agent exceeded max consecutive tool-call turns without a text response."** The resulting project is not yet evidence of a complete website: the source inventory lacks the requested React frontend, full CRUD/auth test suite, completed verification, screenshots, and curated source ZIP.
+
+**What failed:** Gemini’s tool-heavy continuation reached Miki’s consecutive tool-call safety cap before a final response or complete implementation. **Why:** the model repeatedly emitted low-confidence `project_workflow_create`, `file_write`, and `shell_execute` actions; Miki sought clarification/retries and accumulated tool turns without a milestone-aware handoff. **Change that can enable the capability:** improve Miki’s orchestration to checkpoint long delegated builds, surface a resumable continuation when the consecutive-call cap is reached, and prefer bounded implementation milestones over unbounded tool loops. **Improvement:** the parent agent will repair only Miki’s orchestration/prompt/runtime behavior, then instruct Miki to continue from its own scaffold; the parent will not author or complete website files.
+
+
+## Goal-Free Adaptive Workflow (2026-08-24)
+
+### Requirement change
+The user required that Goal setup be completely automatic and that no Goal option or manual Goal menu remain in the dashboard. Ordinary chat must be the only user-facing task entry point. Miki must infer effort, execution level, expected duration, milestone count, checkpoint cadence, and same-context continuation internally.
+
+### Changes implemented in Miki
+- Removed the `PursueGoalPanel` import and render path from `packages/ui/frontend/src/pages/chat-page.tsx`.
+- Removed the `/goal` chat shortcut and its local UI state from the chat page.
+- Removed the unused dashboard Goal panel and Goal API UI modules, and removed the English `pursueGoal` translation namespace.
+- Added `buildAdaptiveExecutionPlan()` to the internal level router. The planner infers a level from the ordinary request, then adjusts estimated minutes, maximum run minutes, milestone count, and checkpoint cadence from scope signals such as dependencies, authentication, databases, tests, screenshots, documentation, and multi-step language.
+- Ordinary action messages are wrapped automatically by `prepareOrdinaryChatMessage()` with an execution contract that explicitly forbids asking the user to create or choose a Goal, level, duration, milestone, or checkpoint.
+- The inferred maximum run time is passed into the actual `AgentOrchestrator.runAgentLoop()` deadline through the internal `adaptiveRunTimeoutMs` option. The value is bounded between five minutes and six hours, and never bypasses the existing safety deadline mechanism.
+
+### Verification evidence
+- `npm run build --workspace=@miki/core` passed after the adaptive deadline integration.
+- `npm --prefix packages/ui/frontend run build` passed after removing the Goal UI.
+- `npx vitest run packages/core/src/level-router.test.ts` passed: 13 tests.
+- The authenticated dashboard was reloaded and visually checked. The visible surface contains ordinary chat, model status, navigation, and the composer; no `Pursue Goal` button, Goal dialog, Goal menu, or `/goal` affordance is exposed.
+- An ordinary chat message, without manual Goal setup, caused one safe `File Read` activity and returned `ADAPTIVE_CHAT_OK: level=adaptive, same_context_continuation=enabled`.
+
+### Failures and repairs during this change
+1. The first adaptive prompt revision changed a legacy phrase and broke two focused router assertions. The cause was a compatibility-sensitive text assertion, not a routing defect. The enabling change was restoring the explicit `Execute the user's goal yourself` marker while retaining the new adaptive metadata. All 13 focused tests then passed.
+2. After a restart, the dashboard briefly showed `No Model Configured` because the ignored launcher state still pointed to an unavailable OpenCode model while the runtime `.env` selected Gemini. The cause was persisted launcher-state drift. The enabling change was reconciling the ignored active-model state and selecting the configured Gemini model through Miki's own launcher endpoint. A fresh model API query then reported Gemini available and default, and the dashboard returned to Ready.
+3. The start script continues to report an `EADDRINUSE` collision on the legacy control port 18700 when an older Miki launcher shell remains alive, although the gateway/core services can still start on their configured ports. This is a runtime process-lifecycle cleanup limitation that should be repaired in the launcher shutdown/restart path; it is not a website implementation result.
+
+### Remaining limitations
+- The delegated authenticated posts website is still incomplete. Miki has created a partial scaffold and frontend/backend files, but no verified complete CRUD website, end-to-end browser evidence, curated source ZIP, or final website screenshots have been produced yet. The parent agent has not authored the website code, in accordance with the delegation boundary.
+- Gemini/OpenCode fallback runs have shown provider rate limiting, low-confidence tool calls, malformed model-generated tool JSON, and incomplete milestone execution. Miki's parser, execution contract, checkpoint loop, and adaptive budget were improved, but provider reliability and long tool-heavy coding completion remain unresolved.
+- The Goal backend/router compatibility APIs remain internal for runtime compatibility, but they are no longer exposed as dashboard controls or chat shortcuts.
+
+
+## Adaptive runtime and malformed tool JSON repair (2026-08-24)
+
+Miki now calculates an internal adaptive execution plan from ordinary chat requests. The plan selects an execution level, estimates work duration, derives a bounded maximum run time, chooses a milestone count, sets a checkpoint cadence, and enables same-context continuation. The selected maximum duration is passed into the real agent-loop deadline through an internal option bounded to five minutes through six hours; no Goal control is required or exposed.
+
+The dashboard no longer renders the manual Pursue Goal panel, Goal shortcut, Goal translations, or Goal UI API modules. The remaining Goal router and persistence code is internal compatibility infrastructure only. A fresh authenticated browser check showed the standard chat composer and no Goal setup control. An ordinary user message completed a safe File Read and returned `ADAPTIVE_CHAT_OK: level=adaptive, same_context_continuation=enabled`.
+
+The main agent parser now normalizes literal control characters inside model-generated JSON tool arguments and extracts a bounded JSON object when a provider wraps it with harmless surrounding text. Unrecoverable or truncated payloads still fail safely rather than being executed. Focused regression coverage passed together with the existing agent tests: 44 tests across the agent and level-router files. Core TypeScript compilation also passed.
+
+The CLI now forwards SIGTERM and SIGINT to its gateway child before exiting, reducing orphaned gateway processes and stale-port collisions during restarts. A legacy control-port collision was observed before this change because an older launcher shell left a child alive; the new forwarding repair is syntactically validated, but a full restart-cycle test should still be performed on the target operating systems.
+
+The delegated `authenticated-blog-app` remains incomplete. Miki has created a partial scaffold, landing page, and some frontend/backend files, but it has not yet produced verified complete authentication, posts CRUD, end-to-end browser evidence, screenshots, or a curated website ZIP. Gemini fallback has repeatedly stopped after small milestones or reported provider/tool warnings. This remains the primary unresolved capability limitation; the parent agent has not written the website implementation.
