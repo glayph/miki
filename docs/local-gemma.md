@@ -73,7 +73,7 @@ The local server should be started with bounded, non-remote reasoning settings:
 
 ## GitHub Actions LFS path
 
-The `Linux validation` workflow checks out the repository with Git LFS enabled and invokes the same `npm run build:lfs -- --full --no-archive` command used for local validation. Therefore, the build path is not Actions-specific: GitHub Actions provides a clean hosted Linux runner, while a normal Linux checkout can run the identical command independently. The workflow also scans tracked text for credential patterns and uploads a source artifact created with `git archive`; model GGUF files remain outside Git and are downloaded only into user-owned runtime data.
+The `Linux validation` workflow checks out the repository with Git LFS enabled and invokes the same `npm run build:lfs -- --full --no-archive` command used for local validation. Therefore, the build path is not Actions-specific: GitHub Actions provides a clean hosted Linux runner, while a normal Linux checkout can run the identical command independently. The workflow also scans tracked text for credential patterns and uploads a source artifact created with `git archive`; model GGUF files remain outside Git and are downloaded only into user-owned runtime data. The same workflow now includes a `windows-platform-check` job that checks out LFS, parses the PowerShell installer with the native PowerShell parser, and builds the TypeScript workspaces in dependency order. Run [#32749531405](https://github.com/glayph/miki/actions/runs/32749531405) passed both Linux and Windows jobs.
 
 ## Verification evidence
 
