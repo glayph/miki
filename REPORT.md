@@ -77,3 +77,7 @@ The resumed canonical checkout exposed an important maintenance issue: Hugging F
 ## Pinned Gemma artifact repair
 
 The moving Hugging Face `resolve/main` URL changed its underlying Q4_0 file after the first local validation. Miki’s checksum gate correctly rejected the new file because the recorded metadata was stale; this was a truthful safety failure, not a model runtime failure. Official Hugging Face file metadata was checked at pinned revision `858dcdf955fb1b5a43ed2301aea00362fc443a5c`, and the catalog, Linux installer, Windows installer, and guide were updated together to 2,841,481,184 bytes and SHA-256 `8e30dff3ac4c8434c49a7036fa15564bdbb6044e42bf04550bf1a096ad7e6a52`. The repaired provisioner accepted the existing verified file without downloading it again, and a fresh llama.cpp server returned the exact `PINNED_GEMMA_OK` response.
+
+## Windows CI continuation repair
+
+The first Windows platform job correctly checked out Git LFS and parsed `deploy/setup-local-gemma.ps1`, but core compilation failed because the monorepo’s `@miki/config` workspace had not been built first. The Linux path already builds workspace dependencies in order. The Windows job was repaired to build `@miki/config` before `@miki/core`; the next CI run is required to confirm the fix.
