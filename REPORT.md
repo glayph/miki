@@ -46,3 +46,17 @@ The Max-level and Turbo-level live attempts were submitted through the authentic
 ## Local Gemma completion evidence
 
 The authenticated dashboard displayed `llama.cpp/gemma-4-E2B-it-Q4_0` and returned `LOCAL_MIKI_GEMMA_OK` for a normal chat message. After stopping the manual server and restarting Miki, `auto_start=true` launched the managed llama.cpp process from the GGUF path with bounded no-reasoning flags; the subsequent dashboard message returned `LOCAL_GEMMA_AUTOSTART_OK`. Setup instructions and the portable environment contract are in `docs/local-gemma.md`; the ignored machine-local environment is in `config/.env`.
+
+## LFS and self-managed model lifecycle extension
+
+| Capability | Result | Evidence and limitation |
+| --- | --- | --- |
+| Local Linux LFS build | Verified | Installed the Git LFS client in the Linux environment, confirmed the real LFS-managed `llama-server` object, ran `git lfs fsck`, and completed `npm run build:lfs -- --full --no-archive`. |
+| GitHub Actions LFS build | Implemented and pending next CI run | The Linux workflow checks out with `lfs: true` and invokes the same portable local runner, so the hosted and non-hosted paths share the build logic. |
+| LFS pointer safety | Resolved | `build-llama.mjs` now rejects a Git LFS pointer as an executable and falls back to a source build when LFS content is unavailable. |
+| Miki-owned LLM acquisition | Verified | The `llama.cpp` adapter now exposes a checksum-verified allow-listed installer for official Gemma 4 E2B Q4_0, persists the model path, and can activate the installed model through the existing control path. |
+| Startup model recovery | Implemented | `MIKI_AUTO_INSTALL_LOCAL_MODEL=1` enables a guarded startup bootstrap; the Linux and Windows installers enable it after configuring the official model. |
+| Arbitrary download safety | Verified | The catalog resolver rejects arbitrary URLs and unsupported model identifiers; the adapter smoke test confirmed existing-file verification without another download. |
+| Three-hour continuation | Active | One recurring schedule named `Agent Miki autonomous continuation` is enabled with a 10,800-second interval, `runAsNewTask=false`, and current-context continuation instructions. |
+
+The first local LFS probe failed only because the clean Linux environment did not yet have the `git-lfs` executable. Installing that system dependency enabled a real LFS checkout/fsck/build path. Model GGUF files remain outside Git; only the required native runtime is LFS-managed, and the self-installer downloads the approved model into user-owned data with checksum verification.

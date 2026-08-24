@@ -19,6 +19,28 @@ export function parseControlIntent(message: string): ControlIntentResult {
   const voiceInstall = lower.match(
     /(?:install|download|setup|set up|ইনস্টল|ডাউনলোড|স্থাপন).*(?:voice|speech|vtt|whisper|ভয়েস|ভয়েস|স্পিচ).*(?:model|মডেল)\s*([a-z0-9._-]+)?/i,
   );
+
+  const localLlmInstall = lower.match(
+    /(?:install|download|setup|set up|ইনস্টল|ডাউনলোড|স্থাপন).*\b(?:local\s+)?(?:llm|language\s+model|gemma|llama\.cpp|llama-cpp)\b(?:\s+model)?(?:\s+([a-z0-9._-]+))?/i,
+  );
+  if (localLlmInstall && !voiceInstall) {
+    const requested = localLlmInstall[1] || "gemma-4-E2B-it-Q4_0";
+    return {
+      matched: true,
+      explanation: `Install the official allow-listed local LLM ${requested} with checksum verification, then activate it.`,
+      request: {
+        capability: "model_runtime",
+        action: "install",
+        input: {
+          adapter: "llama.cpp",
+          provider: "llama.cpp",
+          model_id: requested,
+          activate: true,
+        },
+        context: { origin: "local" },
+      },
+    };
+  }
   if (voiceInstall) {
     const model = voiceInstall[1] || "base";
     if (!["base", "base.en", "small"].includes(model)) {

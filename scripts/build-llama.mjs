@@ -115,6 +115,21 @@ function findBuiltExecutable(root) {
   return undefined;
 }
 
+function isUsableExecutable(file) {
+  if (!existsSync(file)) return false;
+  try {
+    const prefix = readFileSync(file, { encoding: "utf8", flag: "r" }).slice(
+      0,
+      80,
+    );
+    if (prefix.startsWith("version https://git-lfs.github.com/spec/v1"))
+      return false;
+  } catch {
+    // Native binaries are not valid UTF-8; that is expected and usable.
+  }
+  return statSync(file).size > 1024;
+}
+
 function copyIfDifferent(sourceExecutable, destination) {
   if (path.resolve(sourceExecutable) === path.resolve(destination)) return;
   cpSync(sourceExecutable, destination);
@@ -167,7 +182,7 @@ function persistArtifact(sourceExecutable, mode) {
   );
 }
 
-if (!forceRebuild && existsSync(bundledExecutable)) {
+if (!forceRebuild && isUsableExecutable(bundledExecutable)) {
   persistArtifact(bundledExecutable, "bundled");
   log(
     `Using bundled ${platformKey} llama-server artifact; no separate server command is required.`,
@@ -175,7 +190,11 @@ if (!forceRebuild && existsSync(bundledExecutable)) {
   process.exit(0);
 }
 
-if (!forceRebuild && existsSync(distExecutable) && existsSync(metadataPath)) {
+if (
+  !forceRebuild &&
+  isUsableExecutable(distExecutable) &&
+  existsSync(metadataPath)
+) {
   try {
     const metadata = JSON.parse(readFileSync(metadataPath, "utf8"));
     if (

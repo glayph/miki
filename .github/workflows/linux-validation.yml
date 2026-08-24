@@ -37,17 +37,8 @@ jobs:
             git lfs fsck
           fi
 
-      - name: Typecheck and build
-        run: npm run build
-
-      - name: Run tests
-        run: npm test
-
-      - name: Check Linux 24/7 readiness
-        run: npm run runtime:24-7:check
-
-      - name: Run verification workflow
-        run: npm run verify
+      - name: Build and validate LFS with the portable local runner
+        run: npm run build:lfs -- --full --no-archive
 
       - name: Scan tracked text for supplied credential patterns
         shell: bash

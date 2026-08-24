@@ -4,6 +4,11 @@ import {
   synchronizeLocalRuntimeForModel,
   type LocalRuntimeHealth,
 } from "../llm/local/local-runtime.js";
+import {
+  installLocalModel,
+  listLocalModelCatalog,
+  resolveLocalModelCatalog,
+} from "../llm/local/model-provisioner.js";
 import { VoiceRuntimeManager } from "../voice-runtime.js";
 import type { RuntimePaths } from "../paths.js";
 
@@ -80,7 +85,10 @@ export function createVoiceRuntimeAdapter(
   };
 }
 
-export function createLlamaCppAdapter(): ModelRuntimeAdapter {
+export function createLlamaCppAdapter(
+  runtimePaths?: RuntimePaths,
+  activateModel?: (model: string) => Promise<Record<string, unknown>>,
+): ModelRuntimeAdapter {
   const inspect = (model?: string): ModelRuntimeDescriptor => {
     const health = getLocalRuntimeHealth(model);
     const local = model ? isLocalModel(model) : health.configured;
@@ -93,8 +101,8 @@ export function createLlamaCppAdapter(): ModelRuntimeAdapter {
       compatible: local,
       health,
       limitations: [
-        "The runtime uses operator-provided llama-server and GGUF files.",
-        "General model download and native dependency installation are not implemented by this adapter.",
+        "Only official models in Miki's local catalog can be downloaded automatically.",
+        "The native llama.cpp executable is bundled or must be installed separately.",
       ],
     };
   };
@@ -115,6 +123,42 @@ export function createLlamaCppAdapter(): ModelRuntimeAdapter {
         limitations: transition.error
           ? [transition.error]
           : inspect(model).limitations,
+      };
+    },
+    install: async (input) => {
+      const requested = input.model_id ?? input.model ?? input.model_name;
+      const catalog = resolveLocalModelCatalog(requested);
+      const installed = await installLocalModel(requested, {
+        dataDir: runtimePaths?.dataDir,
+        configDir: runtimePaths?.configDir,
+      });
+      process.env.MIKI_LOCAL_MODEL_PATH = installed.path;
+      process.env.MIKI_GEMMA_MODEL_PATH = installed.path;
+      const modelName = catalog.model_name;
+      const activation =
+        input.activate === false || !activateModel
+          ? undefined
+          : await activateModel(modelName);
+      const runtime = await synchronizeLocalRuntimeForModel(modelName);
+      return {
+        ...inspect(modelName),
+        model: modelName,
+        installed: true,
+        active:
+          runtime.action === "started" || runtime.action === "already_ready",
+        health: runtime.health,
+        installation: {
+          id: catalog.id,
+          filename: catalog.filename,
+          source: catalog.url,
+          path: installed.path,
+          downloaded: installed.downloaded,
+          verified: installed.verified,
+          bytes: installed.bytes,
+          available_catalog: listLocalModelCatalog().map((item) => item.id),
+        },
+        activation,
+        limitations: runtime.error ? [runtime.error] : [],
       };
     },
   };

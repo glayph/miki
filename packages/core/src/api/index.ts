@@ -491,7 +491,7 @@ const launcherCompatRouter = createLauncherCompatRouter({
       controller,
       runtimePaths,
       modelAdapters: [
-        createLlamaCppAdapter(),
+        createLlamaCppAdapter(runtimePaths, controller.setActiveModel),
         createVoiceRuntimeAdapter(runtimePaths),
       ],
       approvals: {

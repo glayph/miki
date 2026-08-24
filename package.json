@@ -16,6 +16,8 @@
     "build:release:offline": "node scripts/build-offline-release.mjs",
     "build:release:linux": "node scripts/build-offline-release.mjs",
     "build:release:windows": "node scripts/build-offline-release.mjs",
+    "build:lfs": "node scripts/build-lfs-local.mjs",
+    "build:lfs:local": "node scripts/build-lfs-local.mjs --pull --full",
     "dev": "node scripts/dev.js",
     "start": "node bin/miki.js",
     "runtime:24-7": "node scripts/miki-24-7.mjs",

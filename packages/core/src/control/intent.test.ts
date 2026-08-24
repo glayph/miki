@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { parseControlIntent } from "./intent.js";
 
 describe("parseControlIntent", () => {
@@ -25,6 +26,27 @@ describe("parseControlIntent", () => {
     expect(result.request?.input).toEqual({
       patch: { agent: { resource: { mode: "eco" } } },
     });
+  });
+
+  it("parses a local Gemma installation request", () => {
+    const result = parseControlIntent(
+      "download and install the local Gemma model",
+    );
+    expect(result.matched).toBe(true);
+    expect(result.request).toEqual(
+      expect.objectContaining({
+        capability: "model_runtime",
+        action: "install",
+      }),
+    );
+    expect(result.request?.input).toEqual(
+      expect.objectContaining({
+        adapter: "llama.cpp",
+        provider: "llama.cpp",
+        model_id: "gemma-4-E2B-it-Q4_0",
+        activate: true,
+      }),
+    );
   });
 
   it("does not guess ambiguous requests", () => {

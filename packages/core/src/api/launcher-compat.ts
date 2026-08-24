@@ -120,6 +120,7 @@ import {
   normalizeLocalModelConfig,
   synchronizeLocalRuntimeForModel,
 } from "../llm/local/local-runtime.js";
+import { installLocalModel } from "../llm/local/model-provisioner.js";
 import { globalLogger, type LogLevel } from "../structured-logger.js";
 import type { AgentControlService } from "../control/service.js";
 import type { ControlOperationRequest, ControlPlan } from "../control/types.js";
@@ -2658,6 +2659,31 @@ function defaultModelsFromSettings(): StoredModel[] {
   });
 }
 
+async function autoInstallConfiguredLocalModel(
+  paths: RuntimePaths,
+): Promise<void> {
+  if (process.env.MIKI_AUTO_INSTALL_LOCAL_MODEL !== "1") return;
+  if (!/^llama\.cpp\//i.test(settings.defaultModel)) return;
+  const configuredPath =
+    process.env.MIKI_LOCAL_MODEL_PATH || process.env.MIKI_GEMMA_MODEL_PATH;
+  if (configuredPath && fs.existsSync(configuredPath)) return;
+  try {
+    const installed = await installLocalModel(settings.defaultModel, {
+      dataDir: paths.dataDir,
+      configDir: paths.configDir,
+    });
+    process.env.MIKI_LOCAL_MODEL_PATH = installed.path;
+    process.env.MIKI_GEMMA_MODEL_PATH = installed.path;
+    console.info(
+      `[Launcher] Auto-installed and verified local model ${installed.catalog.id}.`,
+    );
+  } catch (error) {
+    console.warn(
+      `[Launcher] Local model auto-install unavailable: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
+}
+
 function localModelCapabilityWarning(
   provider: string,
   stored: StoredModel,
@@ -3596,9 +3622,12 @@ export function createLauncherCompatRouter({
   }
   syncProviderSecretsToEnv(paths);
   configureLocalModels(state.models || []);
-  // Reconcile the selected model at startup. Cloud defaults stop any owned
-  // llama-server child; local defaults start it asynchronously when configured.
-  void synchronizeLocalRuntimeForModel(settings.defaultModel);
+  // Reconcile the selected model at startup. If explicitly enabled, the local
+  // catalog bootstrap runs first and writes the durable model path.
+  void autoInstallConfiguredLocalModel(paths).finally(() => {
+    configureLocalModels(state.models || []);
+    void synchronizeLocalRuntimeForModel(settings.defaultModel);
+  });
 
   const syncConfigToRuntimeFiles = () => {
     state.config = validateWorkspaceConfig(

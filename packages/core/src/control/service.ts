@@ -101,7 +101,7 @@ const READ_ONLY_CAPABILITIES: ControlCapabilityDescriptor[] = [
     actions: ["inspect"],
     supportsApproval: false,
     limitations: [
-      "General model download and installation require a runtime adapter and explicit approval.",
+      "Automatic installation is restricted to registered, allow-listed runtime adapters and remains approval-gated.",
     ],
   },
 ];
