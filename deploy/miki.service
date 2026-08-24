@@ -5,13 +5,12 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=%i
 WorkingDirectory=%h/miki
 Environment=NODE_ENV=production
 Environment=MIKI_RUNTIME_ROOT=%h/.local/share/miki/runtime
 Environment=MIKI_WORKSPACE_DIR=%h/.local/share/miki/workspace
 EnvironmentFile=-%h/miki/config/.env
-ExecStart=/usr/bin/node %h/miki/bin/miki.js
+ExecStart=/usr/bin/env node %h/miki/bin/miki.js
 Restart=always
 RestartSec=5
 NoNewPrivileges=true
