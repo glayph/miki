@@ -134,6 +134,39 @@ export function createPursueGoal(
   })
 }
 
+export type MikiTaskLevel =
+  | "normal"
+  | "adaptive"
+  | "low"
+  | "medium"
+  | "high"
+  | "extra"
+  | "max"
+  | "turbo"
+
+export interface MikiLevelRunResult {
+  ok: boolean
+  level: MikiTaskLevel
+  goal: string
+  sessionId: string
+  response: string
+  startedAt: string
+  finishedAt: string
+  error?: string
+}
+
+export function runMikiLevel(input: {
+  goal: string
+  level: MikiTaskLevel
+  sessionId?: string
+}): Promise<MikiLevelRunResult> {
+  return request<MikiLevelRunResult>("/api/agent/level-run", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  })
+}
+
 export function updatePursueGoal(
   goalId: number,
   input: UpdatePursueGoalInput,

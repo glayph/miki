@@ -47,6 +47,12 @@ import { createSkillsRouter } from "../skill-api.js";
 import { PluginChannelRuntimeManager } from "../plugins/plugin-channel-runtime.js";
 import { summarizeAgentRoute } from "../agent-router.js";
 import {
+  executeGoalThroughMiki,
+  prepareOrdinaryChatMessage,
+  MIKI_TASK_LEVELS,
+  type MikiTaskLevel,
+} from "../level-router.js";
+import {
   buildWorkflowAccelerationPlan,
   buildWorkflowDecisionPattern,
 } from "../workflow-accelerator.js";
@@ -946,6 +952,39 @@ app.use(
 // whatever tools are configured, e.g. shell_execute under TRUSTED_FULL_ACCESS --
 // with zero authentication (#17).
 app.post("/api/chat", requireHttpAuth, handleChatRequest);
+
+// Explicit Miki-owned task-level API. Every level request still uses the
+// existing orchestrator, tools, approvals, persistence, and safety boundary;
+// this endpoint only adds level selection and a durable, machine-readable
+// execution contract for callers and automation.
+app.get("/api/agent/levels", requireHttpAuth, (_req, res) => {
+  res.json({ levels: MIKI_TASK_LEVELS });
+});
+
+app.post("/api/agent/level-run", requireHttpAuth, async (req, res) => {
+  const body =
+    req.body && typeof req.body === "object" && !Array.isArray(req.body)
+      ? (req.body as Record<string, unknown>)
+      : {};
+  const goal = typeof body.goal === "string" ? body.goal.trim() : "";
+  if (!goal) {
+    res.status(400).json({ error: "goal is required" });
+    return;
+  }
+  const requestedLevel =
+    typeof body.level === "string" &&
+    (MIKI_TASK_LEVELS as readonly string[]).includes(body.level)
+      ? (body.level as MikiTaskLevel)
+      : undefined;
+  const sessionId =
+    typeof body.sessionId === "string" ? body.sessionId : undefined;
+  const result = await executeGoalThroughMiki(orchestrator, {
+    goal,
+    level: requestedLevel,
+    sessionId,
+  });
+  res.status(result.ok ? 200 : 422).json(result);
+});
 
 // UI compatibility API used by the bundled dashboard.
 app.use("/api", launcherCompatRouter);
@@ -2012,7 +2051,7 @@ mikiWss.on("connection", (ws, req) => {
         try {
           for await (const chunk of orchestrator.runAgentLoop(
             sessionId,
-            messageForAgent,
+            prepareOrdinaryChatMessage(messageForAgent),
             undefined,
             {
               feedbackProvider: () => {
@@ -3114,10 +3153,11 @@ async function handleChatRequest(req: Request, res: Response): Promise<void> {
   }
   try {
     let fullResponse = "";
+    const messageForMiki = prepareOrdinaryChatMessage(String(message));
     await runWithCallOrigin(resolveCallOrigin(req), async () => {
       for await (const chunk of orchestrator.runAgentLoop(
         session_id,
-        message,
+        messageForMiki,
       )) {
         const data = JSON.parse(chunk);
         if (data.type === "stream_chunk") {

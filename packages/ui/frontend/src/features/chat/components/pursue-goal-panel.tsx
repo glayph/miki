@@ -14,6 +14,8 @@ import {
   createPursueGoal,
   getPursueGoal,
   updatePursueGoal,
+  runMikiLevel,
+  type MikiTaskLevel,
 } from "@/api/goals"
 import { Badge } from "@/shared/ui/badge"
 import { Button } from "@/shared/ui/button"
@@ -63,6 +65,7 @@ export function PursueGoalPanel({
   const [objective, setObjective] = useState("")
   const [description, setDescription] = useState("")
   const [steps, setSteps] = useState("")
+  const [level, setLevel] = useState<MikiTaskLevel>("normal")
 
   const activeGoal = snapshot?.active ?? null
   const progress = useMemo(
@@ -99,19 +102,33 @@ export function PursueGoalPanel({
     if (!objective.trim()) return
     setSaving(true)
     try {
-      setSnapshot(
-        await createPursueGoal({
-          objective: objective.trim(),
-          description: description.trim() || undefined,
-          steps: parseSteps(steps),
-          replaceExisting: Boolean(activeGoal),
-        }),
-      )
+      const goalText = [objective.trim(), description.trim(), steps.trim()]
+        .filter(Boolean)
+        .join("\n\n")
+      const run = await runMikiLevel({ goal: goalText, level })
+      if (!run.ok) throw new Error(run.error || "Miki could not complete the goal")
+      try {
+        setSnapshot(
+          await createPursueGoal({
+            objective: objective.trim(),
+            description: description.trim() || undefined,
+            steps: parseSteps(steps),
+            replaceExisting: Boolean(activeGoal),
+          }),
+        )
+      } catch (persistError) {
+        toast.error(
+          persistError instanceof Error
+            ? `Miki completed the run, but goal history was unavailable: ${persistError.message}`
+            : "Miki completed the run, but goal history was unavailable.",
+        )
+      }
+      toast.success(`${t("pursueGoal.toast.started")} · Miki ${run.level}`)
       setObjective("")
       setDescription("")
       setSteps("")
+      setLevel("normal")
       setOpen(false)
-      toast.success(t("pursueGoal.toast.started"))
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : t("pursueGoal.toast.startFailed"),
@@ -283,6 +300,24 @@ export function PursueGoalPanel({
                 className="min-h-24"
                 autoComplete="off"
               />
+            </div>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium" htmlFor="goal-level">
+                Miki execution level
+              </label>
+              <select
+                id="goal-level"
+                name="miki_execution_level"
+                value={level}
+                onChange={(event) => setLevel(event.target.value as MikiTaskLevel)}
+                className="border-input bg-background text-foreground h-9 rounded-md border px-3 text-sm"
+              >
+                {(["normal", "adaptive", "low", "medium", "high", "extra", "max", "turbo"] as MikiTaskLevel[]).map((option) => (
+                  <option key={option} value={option}>
+                    {option[0].toUpperCase() + option.slice(1)}
+                  </option>
+                ))}
+              </select>
             </div>
             <div className="grid gap-2">
               <label className="text-sm font-medium" htmlFor="goal-steps">

@@ -25,3 +25,14 @@ Validation results are appended below. Each important failure must include its c
 ## Remaining limitations
 
 The shared project archive was not available in the current project mount. The live Gemini/OpenCode provider paths, local model health, and external side-effect integrations remain configuration-dependent and were not exercised with the credentials supplied in project instructions. Those credentials were intentionally not copied into source, logs, or deliverables and should be rotated before persistent use.
+
+## Miki-owned level execution evidence
+
+| Level/path | Result | Evidence or limitation |
+|---|---|---|
+| Normal chat as implicit goal | Detection and delegation passed. | A normal chat message asking Miki to read `REPORT.md` was accepted by the standard composer and routed through the real agent runtime without using the Goal selector. |
+| Normal chat completion | Blocked by provider configuration. | Miki returned a truthful `gemini credential was missing or rejected` response instead of fabricating completion. Configure a valid provider or a healthy local model, then retry. |
+| Explicit level router | Passed in unit tests. | The router exposes and classifies Normal, Adaptive, Low, Medium, High, Extra, Max, and Turbo, and delegates through `AgentOrchestrator.runAgentLoop`. |
+| Level-aware UI | Passed visually. | Pursue Goal exposes all eight levels and now executes through `/api/agent/level-run` before optional legacy goal-history persistence. |
+
+This distinction is intentional: Miki successfully recognized and attempted the ordinary-message goal, while the environment correctly stopped execution at the missing-model-credential boundary. No user-supplied credentials were copied into source, logs, or release artifacts.
