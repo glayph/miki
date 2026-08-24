@@ -10,12 +10,12 @@ import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 
 import {
+  type MikiTaskLevel,
   type PursueGoalSnapshot,
   createPursueGoal,
   getPursueGoal,
-  updatePursueGoal,
   runMikiLevel,
-  type MikiTaskLevel,
+  updatePursueGoal,
 } from "@/api/goals"
 import { Badge } from "@/shared/ui/badge"
 import { Button } from "@/shared/ui/button"
@@ -106,7 +106,8 @@ export function PursueGoalPanel({
         .filter(Boolean)
         .join("\n\n")
       const run = await runMikiLevel({ goal: goalText, level })
-      if (!run.ok) throw new Error(run.error || "Miki could not complete the goal")
+      if (!run.ok)
+        throw new Error(run.error || "Miki could not complete the goal")
       try {
         setSnapshot(
           await createPursueGoal({
@@ -309,10 +310,23 @@ export function PursueGoalPanel({
                 id="goal-level"
                 name="miki_execution_level"
                 value={level}
-                onChange={(event) => setLevel(event.target.value as MikiTaskLevel)}
+                onChange={(event) =>
+                  setLevel(event.target.value as MikiTaskLevel)
+                }
                 className="border-input bg-background text-foreground h-9 rounded-md border px-3 text-sm"
               >
-                {(["normal", "adaptive", "low", "medium", "high", "extra", "max", "turbo"] as MikiTaskLevel[]).map((option) => (
+                {(
+                  [
+                    "normal",
+                    "adaptive",
+                    "low",
+                    "medium",
+                    "high",
+                    "extra",
+                    "max",
+                    "turbo",
+                  ] as MikiTaskLevel[]
+                ).map((option) => (
                   <option key={option} value={option}>
                     {option[0].toUpperCase() + option.slice(1)}
                   </option>

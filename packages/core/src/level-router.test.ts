@@ -37,7 +37,9 @@ describe("Miki task level router", () => {
   });
 
   it("detects action requests in ordinary chat without hijacking greetings", () => {
-    expect(shouldTreatOrdinaryMessageAsGoal("Build a report for me")).toBe(true);
+    expect(shouldTreatOrdinaryMessageAsGoal("Build a report for me")).toBe(
+      true,
+    );
     expect(shouldTreatOrdinaryMessageAsGoal("Hello, how are you?")).toBe(false);
     expect(shouldTreatOrdinaryMessageAsGoal("What is Linux?")).toBe(false);
     expect(prepareOrdinaryChatMessage("Build a report for me")).toContain(

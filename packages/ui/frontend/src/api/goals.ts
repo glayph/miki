@@ -135,14 +135,7 @@ export function createPursueGoal(
 }
 
 export type MikiTaskLevel =
-  | "normal"
-  | "adaptive"
-  | "low"
-  | "medium"
-  | "high"
-  | "extra"
-  | "max"
-  | "turbo"
+  "normal" | "adaptive" | "low" | "medium" | "high" | "extra" | "max" | "turbo"
 
 export interface MikiLevelRunResult {
   ok: boolean
