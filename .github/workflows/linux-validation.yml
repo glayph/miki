@@ -59,3 +59,47 @@ jobs:
           name: miki-linux-source
           path: release/miki-linux-source.tar.gz
           if-no-files-found: error
+
+  windows-platform-check:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out source and LFS objects
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        shell: pwsh
+        run: npm ci --no-audit --no-fund
+
+      - name: Verify LFS content
+        shell: pwsh
+        run: |
+          git lfs ls-files
+          git lfs fsck
+
+      - name: Parse PowerShell installer
+        shell: pwsh
+        run: |
+          $tokens = $null
+          $errors = $null
+          [System.Management.Automation.Language.Parser]::ParseFile(
+            (Join-Path $pwd 'deploy/setup-local-gemma.ps1'),
+            [ref]$tokens,
+            [ref]$errors
+          ) | Out-Null
+          if ($errors.Count -gt 0) {
+            $errors | Format-List | Out-String | Write-Error
+            exit 1
+          }
+
+      - name: Compile core on Windows
+        shell: pwsh
+        run: npm run build --workspace=@miki/core
