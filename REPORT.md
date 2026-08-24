@@ -81,3 +81,5 @@ The moving Hugging Face `resolve/main` URL changed its underlying Q4_0 file afte
 ## Windows CI continuation repair
 
 The first Windows platform job correctly checked out Git LFS and parsed `deploy/setup-local-gemma.ps1`, but core compilation failed because the monorepo’s `@miki/config` workspace had not been built first. The Linux path already builds workspace dependencies in order. The Windows job was repaired to build `@miki/config` before `@miki/core`; the next CI run is required to confirm the fix.
+
+The first Windows workflow repair built `@miki/config` but core then exposed the next missing workspace dependency, `@miki/installer`. The Windows job was expanded to build config, installer, skills, memory, and core in the same dependency order as the Linux build. This keeps Windows validation deterministic without downloading the large local model.

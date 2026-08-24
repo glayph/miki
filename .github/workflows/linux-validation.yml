@@ -100,10 +100,11 @@ jobs:
             exit 1
           }
 
-      - name: Build config dependency on Windows
+      - name: Build TypeScript workspaces on Windows
         shell: pwsh
-        run: npm run build --workspace=@miki/config
-
-      - name: Compile core on Windows
-        shell: pwsh
-        run: npm run build --workspace=@miki/core
+        run: |
+          npm run build --workspace=@miki/config
+          npm run build --workspace=@miki/installer
+          npm run build --workspace=@miki/skills
+          npm run build --workspace=@miki/memory
+          npm run build --workspace=@miki/core
