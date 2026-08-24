@@ -59,4 +59,15 @@ The authenticated dashboard displayed `llama.cpp/gemma-4-E2B-it-Q4_0` and return
 | Arbitrary download safety | Verified | The catalog resolver rejects arbitrary URLs and unsupported model identifiers; the adapter smoke test confirmed existing-file verification without another download. |
 | Three-hour continuation | Active | One recurring schedule named `Agent Miki autonomous continuation` is enabled with a 10,800-second interval, `runAsNewTask=false`, and current-context continuation instructions. |
 
-The first local LFS probe failed only because the clean Linux environment did not yet have the `git-lfs` executable. Installing that system dependency enabled a real LFS checkout/fsck/build path. The final implementation is pushed in commit `af5e3d6` (`feat: add local LFS and self-managed model lifecycle`). Model GGUF files remain outside Git; only the required native runtime is LFS-managed, and the self-installer downloads the approved model into user-owned data with checksum verification.
+The first local LFS probe failed only because the clean Linux environment did not yet have the `git-lfs` executable. Installing that system dependency enabled a real LFS checkout/fsck/build path. The final implementation is pushed in commit `821b833` (`docs: record LFS and model lifecycle validation`). Model GGUF files remain outside Git; only the required native runtime is LFS-managed, and the self-installer downloads the approved model into user-owned data with checksum verification.
+
+## Continuation-session revalidation
+
+| Check | Result | Evidence |
+| --- | --- | --- |
+| Workspace reconciliation | Resolved | The resumed workspace initially pointed at `4d8849c`; `git fetch` and fast-forward restored canonical `821b833`. |
+| Resumed Git LFS dependency | Resolved | `git-lfs` was absent in the resumed Linux environment; it was installed, `git lfs pull` fetched the 15 MB native object, and `git lfs fsck` passed. |
+| Local Gemma recheck | Passed | The managed llama.cpp endpoint returned the exact `MIKI_LOCAL_RECHECK_OK` response; model SHA-256 remained `eff5313720ed419c369e56a37e6b617f9e4078821d070b16adeb5d723021e6bd`. |
+| 24/7 readiness | Passed | `npm run runtime:24-7:check` confirmed the gateway entry and runtime roots. |
+| Local LFS full validation | Passed | `npm run build:lfs -- --full --no-archive` completed native build, all 53 frontend tests, repository verification, and LFS checks. |
+| Schedule continuity | Passed | The recurring schedule remains active at 10,800 seconds with `runAsNewTask=false`. |
