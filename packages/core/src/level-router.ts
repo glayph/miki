@@ -51,8 +51,14 @@ const LEVEL_PATTERNS: Array<[MikiTaskLevel, RegExp]> = [
     "extra",
     /\bextra(?:[- ]level)?\b|polished web app|web app with login|full[- ]stack|authenticated website/i,
   ],
-  ["high", /\bhigh(?:[- ]level)?\b|deep research|multi-step|investigate|migrate/i],
-  ["medium", /\bmedium(?:[- ]level)?\b|\bbuild\b|\bimplement\b|integrate|deploy|project|application/i],
+  [
+    "high",
+    /\bhigh(?:[- ]level)?\b|deep research|multi-step|investigate|migrate/i,
+  ],
+  [
+    "medium",
+    /\bmedium(?:[- ]level)?\b|\bbuild\b|\bimplement\b|integrate|deploy|project|application/i,
+  ],
   ["low", /\blow(?:[- ]level)?\b|\bfile\b|shell|simple automation|run a test/i],
   ["adaptive", /adaptive|decide|choose|compare|recommend/i],
 ];
@@ -148,8 +154,12 @@ export function buildAdaptiveExecutionPlan(
   const words = normalized ? normalized.split(/\s+/).length : 0;
   const signals = [
     /\b(and|then|after|also|with|including)\b/i.test(normalized),
-    /\b(test|verify|validate|document|screenshot|archive|release)\b/i.test(normalized),
-    /\b(auth|login|database|backend|frontend|api|deploy|github|linux|windows)\b/i.test(normalized),
+    /\b(test|verify|validate|document|screenshot|archive|release)\b/i.test(
+      normalized,
+    ),
+    /\b(auth|login|database|backend|frontend|api|deploy|github|linux|windows)\b/i.test(
+      normalized,
+    ),
     words > 80,
   ].filter(Boolean).length;
   const complexityMultiplier = Math.min(1.75, 1 + signals * 0.15);

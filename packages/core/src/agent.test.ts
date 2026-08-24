@@ -21,21 +21,21 @@ async function waitFor(
 
 describe("tool argument normalization", () => {
   it("recovers literal control characters inside JSON strings", () => {
-    const args = parseToolArguments('{"path":"/tmp/first\nsecond"}')
-    expect(args).toEqual({ path: "/tmp/first\nsecond" })
-  })
+    const args = parseToolArguments('{"path":"/tmp/first\nsecond"}');
+    expect(args).toEqual({ path: "/tmp/first\nsecond" });
+  });
 
   it("extracts one bounded JSON object from a wrapped tool payload", () => {
-    const args = parseToolArguments('prefix {"cmd":"printf ok"} suffix')
-    expect(args).toEqual({ cmd: "printf ok" })
-  })
+    const args = parseToolArguments('prefix {"cmd":"printf ok"} suffix');
+    expect(args).toEqual({ cmd: "printf ok" });
+  });
 
   it("rejects unrecoverable or truncated arguments", () => {
     expect(() => parseToolArguments('{"path":"/tmp/unfinished')).toThrow(
       "Tool arguments are not valid JSON",
-    )
-  })
-})
+    );
+  });
+});
 
 describe("ConcurrentTaskManager", () => {
   it("should start with zero active tasks", () => {

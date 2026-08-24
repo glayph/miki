@@ -52,14 +52,14 @@ describe("Miki task level router", () => {
   it("automatically plans duration, milestones, and same-context continuation", () => {
     const plan = buildAdaptiveExecutionPlan(
       "Build a polished authenticated website with database, tests, screenshots, and documentation",
-    )
-    expect(plan.level).toBe("extra")
-    expect(plan.estimatedMinutes).toBeGreaterThanOrEqual(120)
-    expect(plan.maxRunMinutes).toBeGreaterThan(plan.estimatedMinutes)
-    expect(plan.milestoneCount).toBeGreaterThanOrEqual(8)
-    expect(plan.checkpointEveryTurns).toBeGreaterThan(0)
-    expect(plan.sameContextContinuation).toBe(true)
-  })
+    );
+    expect(plan.level).toBe("extra");
+    expect(plan.estimatedMinutes).toBeGreaterThanOrEqual(120);
+    expect(plan.maxRunMinutes).toBeGreaterThan(plan.estimatedMinutes);
+    expect(plan.milestoneCount).toBeGreaterThanOrEqual(8);
+    expect(plan.checkpointEveryTurns).toBeGreaterThan(0);
+    expect(plan.sameContextContinuation).toBe(true);
+  });
 
   it("builds a prompt that tells Miki to execute and verify the goal", () => {
     const prompt = buildMikiExecutionPrompt("create a report", "high");

@@ -459,7 +459,9 @@ function escapeControlCharactersInsideJsonStrings(value: string): string {
   return output;
 }
 
-export function parseToolArguments(rawArguments: string): Record<string, unknown> {
+export function parseToolArguments(
+  rawArguments: string,
+): Record<string, unknown> {
   const input = rawArguments.trim();
   if (!input) return {};
   const parseCandidate = (candidate: string): Record<string, unknown> => {

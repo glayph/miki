@@ -33,7 +33,9 @@ function parseArgs() {
 
 function configuredWorkspaceDir() {
   return resolve(
-    process.env.MIKI_WORKSPACE_DIR || process.env.Miki_WORKSPACE_DIR || process.cwd(),
+    process.env.MIKI_WORKSPACE_DIR ||
+      process.env.Miki_WORKSPACE_DIR ||
+      process.cwd(),
   );
 }
 
@@ -53,7 +55,14 @@ function resolveGatewayPath() {
 function resolveInstallerExecutable() {
   const candidates = [
     join(packageDir, "..", "installer", "windows", "launcher-go", "Miki.exe"),
-    join(repoRoot, "packages", "installer", "windows", "launcher-go", "Miki.exe"),
+    join(
+      repoRoot,
+      "packages",
+      "installer",
+      "windows",
+      "launcher-go",
+      "Miki.exe",
+    ),
     join(repoRoot, "installer", "windows", "launcher-go", "Miki.exe"),
   ];
   return candidates.find((candidate) => fs.existsSync(candidate)) || null;
@@ -103,7 +112,9 @@ async function startDashboard() {
       child.unref();
       return;
     }
-    console.warn("Windows installer wrapper was not found; using Node gateway.");
+    console.warn(
+      "Windows installer wrapper was not found; using Node gateway.",
+    );
   }
 
   if (!gatewayPath) {
@@ -113,7 +124,8 @@ async function startDashboard() {
   }
 
   console.log("Starting miki dashboard...");
-  if (isTrayMode) console.log("System tray mode requested; starting gateway mode.");
+  if (isTrayMode)
+    console.log("System tray mode requested; starting gateway mode.");
   console.log(`Launching gateway from: ${gatewayPath}`);
 
   gatewayChild = childProcess.spawn(process.execPath, [gatewayPath], {
@@ -182,7 +194,9 @@ async function runDoctor() {
   if (gatewayPath) {
     console.log("1. Run `agent start` to launch the dashboard.");
   } else {
-    console.log("1. Build the gateway or set MIKI_GATEWAY_PATH, then run `agent start`.");
+    console.log(
+      "1. Build the gateway or set MIKI_GATEWAY_PATH, then run `agent start`.",
+    );
   }
   console.log("2. Run `agent help` for command details.");
 }
@@ -192,7 +206,9 @@ async function installPackage() {
 
   if (isWindowsInstaller) {
     console.log("This appears to be running from the Windows installer.");
-    console.log("The agent will launch automatically when installation completes.");
+    console.log(
+      "The agent will launch automatically when installation completes.",
+    );
     return;
   }
 
@@ -218,7 +234,9 @@ async function uninstallPackage() {
   if (!purge) {
     console.log("CLI uninstall completed; workspace data was retained.");
     console.log(`Retained workspace: ${workspaceDir}`);
-    console.log("Use `agent uninstall --purge` only when data deletion is intended.");
+    console.log(
+      "Use `agent uninstall --purge` only when data deletion is intended.",
+    );
     return;
   }
 
@@ -241,9 +259,15 @@ async function showVersion() {
     const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
     console.log("Package Name:     ", pkg.name);
     console.log("Version:          ", pkg.version);
-    console.log("Description:      ", pkg.description || "Local-first AI assistant runtime");
+    console.log(
+      "Description:      ",
+      pkg.description || "Local-first AI assistant runtime",
+    );
     console.log("License:          ", pkg.license || "MIT");
-    console.log("Node Requirement: ", pkg.engines?.node || "^20.19.0 || ^22.13.0 || >=24");
+    console.log(
+      "Node Requirement: ",
+      pkg.engines?.node || "^20.19.0 || ^22.13.0 || >=24",
+    );
     console.log("Package Manager:  ", pkg.packageManager || "npm");
   } catch (error) {
     console.error("Error reading version information:", error.message);
@@ -254,21 +278,41 @@ async function showVersion() {
 function showHelp() {
   console.log("=== miki CLI Command Reference ===\n");
   console.log("Commands:");
-  console.log("  agent start                    Start the miki dashboard and agent runtime");
-  console.log("  agent doctor                   Run system diagnostics and health checks");
-  console.log("  agent install                  Prepare data, logs, and config directories");
-  console.log("  agent uninstall                Remove the CLI workspace registration but retain data");
-  console.log("  agent uninstall --purge        Delete the workspace data, logs, and config directories");
+  console.log(
+    "  agent start                    Start the miki dashboard and agent runtime",
+  );
+  console.log(
+    "  agent doctor                   Run system diagnostics and health checks",
+  );
+  console.log(
+    "  agent install                  Prepare data, logs, and config directories",
+  );
+  console.log(
+    "  agent uninstall                Remove the CLI workspace registration but retain data",
+  );
+  console.log(
+    "  agent uninstall --purge        Delete the workspace data, logs, and config directories",
+  );
   console.log("  agent version                  Show version information");
   console.log("  agent help                     Show this help information");
   console.log("\nFlags:");
-  console.log("  --tray                         Request tray mode (gateway fallback on headless systems)");
+  console.log(
+    "  --tray                         Request tray mode (gateway fallback on headless systems)",
+  );
   console.log("  --help, -h                     Show help");
-  console.log("  --purge                        Allow workspace data deletion during uninstall");
+  console.log(
+    "  --purge                        Allow workspace data deletion during uninstall",
+  );
   console.log("\nEnvironment Variables:");
-  console.log("  MIKI_INSTALLER=1               Indicates Windows installer mode");
-  console.log("  MIKI_WORKSPACE_DIR             Workspace directory for install/uninstall");
-  console.log("  MIKI_GATEWAY_PATH              Explicit built gateway entry file");
+  console.log(
+    "  MIKI_INSTALLER=1               Indicates Windows installer mode",
+  );
+  console.log(
+    "  MIKI_WORKSPACE_DIR             Workspace directory for install/uninstall",
+  );
+  console.log(
+    "  MIKI_GATEWAY_PATH              Explicit built gateway entry file",
+  );
 }
 
 process.on("SIGINT", () => shutdown("SIGINT"));

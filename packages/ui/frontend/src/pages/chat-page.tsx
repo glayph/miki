@@ -1108,24 +1108,22 @@ export function ChatPage() {
         }
         composer={
           <Composer
-              input={input}
-              attachments={attachments}
-              onInputChange={setInput}
-              onAddImages={handleAddImages}
-              onAddAudio={handleAddAudio}
-              onStartVoice={handleStartVoice}
-              onStopVoice={handleStopVoice}
-              voiceState={voiceState}
-              voiceElapsedMs={voiceElapsedMs}
-              onModeClick={handleModeClick}
-              onRemoveAttachment={handleRemoveAttachment}
-              onSend={handleSend}
-              modeLabel={t("chat.workspace.mode")}
-              inputDisabledReason={
-                isEditingMessage ? null : inputDisabledReason
-              }
-              canSend={canSubmit && voiceState === "idle"}
-              contextUsage={contextUsage}
+            input={input}
+            attachments={attachments}
+            onInputChange={setInput}
+            onAddImages={handleAddImages}
+            onAddAudio={handleAddAudio}
+            onStartVoice={handleStartVoice}
+            onStopVoice={handleStopVoice}
+            voiceState={voiceState}
+            voiceElapsedMs={voiceElapsedMs}
+            onModeClick={handleModeClick}
+            onRemoveAttachment={handleRemoveAttachment}
+            onSend={handleSend}
+            modeLabel={t("chat.workspace.mode")}
+            inputDisabledReason={isEditingMessage ? null : inputDisabledReason}
+            canSend={canSubmit && voiceState === "idle"}
+            contextUsage={contextUsage}
           />
         }
       />
