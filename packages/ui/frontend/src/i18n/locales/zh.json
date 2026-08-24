@@ -915,41 +915,6 @@
       "evidence": "证据"
     }
   },
-  "pursueGoal": {
-    "title": "追踪目标",
-    "loading": "正在加载目标",
-    "noActive": "没有活跃目标",
-    "progress": "目标进度",
-    "status": {
-      "active": "活跃",
-      "pending": "待处理",
-      "completed": "已完成",
-      "blocked": "已阻塞",
-      "cancelled": "已取消"
-    },
-    "actions": {
-      "complete": "完成目标",
-      "block": "阻塞",
-      "cancel": "取消目标",
-      "start": "开始"
-    },
-    "fields": {
-      "objective": "目标",
-      "details": "详情",
-      "steps": "步骤"
-    },
-    "toast": {
-      "loadFailed": "目标加载失败",
-      "started": "目标已开始",
-      "startFailed": "目标启动失败",
-      "statusUpdated": "目标{{status}}",
-      "updateFailed": "目标更新失败"
-    },
-    "statusReason": {
-      "completed": "从启动器标记",
-      "stopped": "从启动器停止"
-    }
-  },
   "systemIndex": {
     "toast": {
       "pathCopied": "路径已复制",

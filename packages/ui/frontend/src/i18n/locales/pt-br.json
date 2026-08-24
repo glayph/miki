@@ -915,41 +915,6 @@
       "evidence": "Evidencias"
     }
   },
-  "pursueGoal": {
-    "title": "Perseguir Objetivo",
-    "loading": "Carregando objetivo",
-    "noActive": "Nenhum objetivo ativo",
-    "progress": "Progresso do objetivo",
-    "status": {
-      "active": "Ativo",
-      "pending": "Pendente",
-      "completed": "Concluido",
-      "blocked": "Bloqueado",
-      "cancelled": "Cancelado"
-    },
-    "actions": {
-      "complete": "Concluir objetivo",
-      "block": "Bloquear",
-      "cancel": "Cancelar objetivo",
-      "start": "Iniciar"
-    },
-    "fields": {
-      "objective": "Objetivo",
-      "details": "Detalhes",
-      "steps": "Etapas"
-    },
-    "toast": {
-      "loadFailed": "Falha ao carregar objetivo",
-      "started": "Objetivo iniciado",
-      "startFailed": "Falha ao iniciar objetivo",
-      "statusUpdated": "Objetivo {{status}}",
-      "updateFailed": "Falha ao atualizar objetivo"
-    },
-    "statusReason": {
-      "completed": "Marcado pelo launcher",
-      "stopped": "Interrompido pelo launcher"
-    }
-  },
   "systemIndex": {
     "toast": {
       "pathCopied": "Caminho copiado",
