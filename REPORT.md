@@ -36,3 +36,5 @@ The shared project archive was not available in the current project mount. The l
 | Level-aware UI | Passed visually. | Pursue Goal exposes all eight levels and now executes through `/api/agent/level-run` before optional legacy goal-history persistence. |
 
 This distinction is intentional: Miki successfully recognized and attempted the ordinary-message goal, while the environment correctly stopped execution at the missing-model-credential boundary. No user-supplied credentials were copied into source, logs, or release artifacts.
+
+The authenticated eight-level probe is documented in `docs/level-probe-results.md`. Normal, Adaptive, Low, Medium, High, Extra, Max, and Turbo each returned HTTP 200 from `/api/agent/level-run` with the requested level preserved and the same truthful missing-Gemini-credential boundary. The safe probe goals prohibited file changes, external services, and side effects, so this evidence proves Miki-owned routing and reporting rather than falsely claiming completed work.
