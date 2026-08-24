@@ -1,10 +1,14 @@
+import { afterEach, describe, expect, it } from "vitest";
+
 import {
   DEFAULT_GEMINI_MODEL,
   DEFAULT_GEMINI_PROVIDER,
+  DEFAULT_LOCAL_GEMMA_MODEL,
+  DEFAULT_LOCAL_GEMMA_PROVIDER,
   settings,
 } from "./index.js";
 
-describe("centralized Gemini default model", () => {
+describe("centralized local Gemma default model", () => {
   const originalModel = process.env.MIKI_MODEL;
   const originalProvider = process.env.MIKI_PROVIDER;
   const originalSettingsModel = settings.defaultModel;
@@ -19,10 +23,12 @@ describe("centralized Gemini default model", () => {
     settings.provider = originalSettingsProvider;
   });
 
-  it("exposes Gemini as the canonical default", () => {
+  it("exposes local Gemma as the canonical default", () => {
+    expect(DEFAULT_LOCAL_GEMMA_MODEL).toBe("llama.cpp/gemma-4-E2B-it-Q4_0");
+    expect(DEFAULT_LOCAL_GEMMA_PROVIDER).toBe("llama.cpp");
     expect(DEFAULT_GEMINI_MODEL).toBe("gemini/gemini-3.5-flash-lite");
     expect(DEFAULT_GEMINI_PROVIDER).toBe("gemini");
-    expect(settings.getSupportedModels()[0]).toBe(DEFAULT_GEMINI_MODEL);
+    expect(settings.getSupportedModels()[0]).toBe(DEFAULT_LOCAL_GEMMA_MODEL);
   });
 
   it("keeps an explicit model selection as an override", () => {

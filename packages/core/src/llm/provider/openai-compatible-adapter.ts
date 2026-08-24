@@ -25,6 +25,16 @@ import { normalizeGeminiExtra } from "./gemini-compat.js";
 
 const clientCache = new Map<string, OpenAI>();
 
+function localMaxTokens(): number {
+  const configured = Number.parseInt(
+    process.env.MIKI_LOCAL_MAX_TOKENS || "512",
+    10,
+  );
+  return Number.isFinite(configured) && configured >= 32
+    ? Math.min(configured, 4096)
+    : 512;
+}
+
 function defaultTimeoutMs(provider: DirectProviderConfig): number {
   if (provider.id === "llama.cpp") {
     const configured = Number.parseInt(
@@ -275,6 +285,21 @@ export class OpenAICompatibleAdapter implements LLMProviderAdapter {
       messages,
       ...providerExtra,
     };
+    if (provider.id === "llama.cpp") {
+      const requestedMaxTokens =
+        typeof requestBody.max_tokens === "number"
+          ? requestBody.max_tokens
+          : localMaxTokens();
+      requestBody.max_tokens = Math.min(requestedMaxTokens, localMaxTokens());
+      // Gemma 4’s llama.cpp chat template can emit long reasoning traces when
+      // remote-provider thinking fields are forwarded. Local Miki cycles need
+      // a bounded final response, so do not send those remote-only controls.
+      delete requestBody.reasoning;
+      delete requestBody.reasoning_effort;
+      delete requestBody.reasoning_format;
+      delete requestBody.thinking;
+      delete requestBody.thinking_level;
+    }
     for (const key of Object.keys(requestBody)) {
       if (requestBody[key] === undefined) delete requestBody[key];
     }

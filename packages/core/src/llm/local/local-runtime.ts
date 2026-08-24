@@ -179,14 +179,19 @@ function localEntry(model: string): LocalModelEntry | undefined {
 }
 
 function localConfig(entry?: LocalModelEntry): LocalLlamaModelConfig {
-  return (
-    normalizeLocalModelConfig(entry?.local, undefined) || {
-      runtime: "llama.cpp",
-      model_format: "gguf",
-      enabled: true,
-      auto_start: true,
-    }
+  const environmentModelPath = stringOrUndefined(
+    process.env.MIKI_LOCAL_MODEL_PATH || process.env.MIKI_GEMMA_MODEL_PATH,
   );
+  const normalized = normalizeLocalModelConfig(entry?.local, undefined) || {
+    runtime: "llama.cpp" as const,
+    model_format: "gguf" as const,
+    enabled: true,
+    auto_start: true,
+  };
+  if (!normalized.model_path && environmentModelPath) {
+    normalized.model_path = environmentModelPath;
+  }
+  return normalized;
 }
 
 function localBaseUrl(entry?: LocalModelEntry): string {
@@ -333,6 +338,13 @@ function runtimeArgs(
   modelPath: string,
   port: number,
 ): string[] {
+  const localMaxTokens = Math.min(
+    Math.max(
+      32,
+      Number.parseInt(process.env.MIKI_LOCAL_MAX_TOKENS || "256", 10) || 256,
+    ),
+    4096,
+  );
   const args = [
     "--host",
     "127.0.0.1",
@@ -343,6 +355,16 @@ function runtimeArgs(
     modelPath,
     "--alias",
     "local-model",
+    "--parallel",
+    "1",
+    "--reasoning",
+    "off",
+    "--reasoning-format",
+    "none",
+    "--reasoning-budget",
+    "0",
+    "--n-predict",
+    String(localMaxTokens),
   ];
   if (config.context_size !== undefined)
     args.push("--ctx-size", String(config.context_size));
