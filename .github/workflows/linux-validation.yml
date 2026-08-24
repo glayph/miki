@@ -1,0 +1,70 @@
+name: Linux validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux-build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Check out source and LFS objects
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Verify LFS content
+        shell: bash
+        run: |
+          git lfs ls-files
+          if git lfs ls-files | grep -q '^'; then
+            git lfs fsck
+          fi
+
+      - name: Typecheck and build
+        run: npm run build
+
+      - name: Run tests
+        run: npm test
+
+      - name: Check Linux 24/7 readiness
+        run: npm run runtime:24-7:check
+
+      - name: Run verification workflow
+        run: npm run verify
+
+      - name: Scan tracked text for supplied credential patterns
+        shell: bash
+        run: |
+          if git grep -I -n -E 'AQ\.|sk-[A-Za-z0-9]{16,}|ghp_[A-Za-z0-9]{20,}' -- ':!package-lock.json' ':!pnpm-lock.yaml'; then
+            echo 'Potential credential pattern found in tracked text.'
+            exit 1
+          fi
+
+      - name: Package source artifact
+        run: |
+          mkdir -p release
+          git archive --format=tar.gz --output=release/miki-linux-source.tar.gz HEAD
+
+      - name: Upload Linux source artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: miki-linux-source
+          path: release/miki-linux-source.tar.gz
+          if-no-files-found: error
