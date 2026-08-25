@@ -200,3 +200,6 @@ The ordinary-chat CRUD milestone produced no file changes after submission. The 
 
 ## Latest own-post CRUD retry audit (2026-08-25)
 The latest ordinary-chat retry completed without any delegated source changes. Independent route inspection still finds only `GET /api/posts` and `POST /api/posts` in the coherent `src/server/index.ts`; detail, update, delete, and ownership-enforcement routes remain absent there. `tests/smoke.test.ts` is still only a seven-line sanity test. The legacy `server/index.ts` continues to contain a separate, unverified CRUD implementation and is not the declared runtime entrypoint. No website ZIP is authorized.
+
+## Post-detail route independent HTTP verification (2026-08-25)
+Agent Miki added `GET /api/posts/:id` to the coherent entrypoint and expanded the smoke test to include health and missing-post behavior. Independent built-server HTTP testing returned 200 for health, 201 for registration, 201 for post creation, 200 for the created post detail, and 404 with `Post not found` for a missing ID. The route is now verified, but update/delete/ownership enforcement, full frontend behavior, browser UI smoke checks, and packaging remain unfinished.
