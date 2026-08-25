@@ -209,3 +209,6 @@ The coherent website source now contains `GET /api/posts/:id`; independent `npm 
 
 ## Delegated update/delete test-first failure (2026-08-25)
 Agent Miki expanded `tests/smoke.test.ts` to five tests covering detail, update, delete, ownership, unauthenticated, and not-found cases, but did not add the corresponding `PUT` or `DELETE` routes to `src/server/index.ts`. Independent `npm run build` still exits 0, while `npm test` fails: the owner update expects 200 but receives 404, and unauthenticated update expects 401 but receives 404; the missing-post 404 test passes. This is a concrete partial implementation with tests ahead of runtime behavior, not a completed CRUD milestone.
+
+## Owner-authenticated PUT delegation failure (2026-08-25)
+The next ordinary-chat request produced no delegated file changes after the prior detail-route milestone. Independent inspection still finds only `GET /api/posts`, `GET /api/posts/:id`, and `POST /api/posts` in the coherent entrypoint. The expanded five-test suite remains ahead of implementation: `npm run build` exits 0, but `npm test` exits 1 with the owner update receiving 404 instead of 200 and unauthenticated update receiving 404 instead of 401; the missing-post 404 test passes. The failure is recorded without modifying the website source.
