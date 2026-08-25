@@ -227,3 +227,6 @@ Canonical tracked revision is `54dfb1b`; only the intentionally untracked `authe
 
 ## Final same-context checkpoint before next delegated retry (2026-08-25)
 Canonical tracked revision remains `adf2e66`; the only untracked paths are the intentionally excluded `authenticated-blog-app/` scaffold and `workflow.json`. The coherent backend still contains only `GET /api/posts`, `GET /api/posts/:id`, and `POST /api/posts`; owner-authenticated PUT/DELETE routes remain absent. The repeating schedule is active at 10800 seconds with `runAsNewTask=false` and the last execution recorded at 02:37 Asia/Dhaka. Latest canonical CI run `32806561713` succeeded. No website ZIP is permitted yet because the delegated implementation and verification are incomplete.
+
+## Latest DELETE-route retry audit (2026-08-25)
+No delegated website files changed after 04:03. The coherent `src/server/index.ts` still contains only `GET /api/posts`, `GET /api/posts/:id`, and `POST /api/posts`; PUT and DELETE remain absent. The existing independent Jest log still reports 3 passing and 2 failing tests: authenticated update expected 200 but received 404, and unauthenticated update expected 401 but received 404. The website remains incomplete; no ZIP is packaged.
