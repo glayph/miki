@@ -206,3 +206,6 @@ Agent Miki added `GET /api/posts/:id` to the coherent entrypoint and expanded th
 
 ## Latest post-detail validation checkpoint (2026-08-25)
 The coherent website source now contains `GET /api/posts/:id`; independent `npm run build` and `npm test` both pass, with two tests covering health and missing-post 404. The coherent entrypoint still lacks `PUT` and `DELETE` post routes and ownership tests, so full own-post CRUD and the final website package remain incomplete.
+
+## Delegated update/delete test-first failure (2026-08-25)
+Agent Miki expanded `tests/smoke.test.ts` to five tests covering detail, update, delete, ownership, unauthenticated, and not-found cases, but did not add the corresponding `PUT` or `DELETE` routes to `src/server/index.ts`. Independent `npm run build` still exits 0, while `npm test` fails: the owner update expects 200 but receives 404, and unauthenticated update expects 401 but receives 404; the missing-post 404 test passes. This is a concrete partial implementation with tests ahead of runtime behavior, not a completed CRUD milestone.
