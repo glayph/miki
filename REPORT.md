@@ -248,3 +248,6 @@ The local-Qwen attempt remained in an active/thinking state and the coherent sou
 
 ## Additional tool-confidence evidence (2026-08-25)
 The refreshed Logs view shows the delegated Flash Lite execution emitted both `[Agent] Low confidence in tool file_read (0.25). Seeking clarification...` and `[Agent] Low confidence in tool shell_execute (0.25). Seeking clarification...`, alongside provider completions and the existing high tool-execution error-rate signal. The Qwen attempt displayed a generated file-write argument in chat but independent inspection confirmed that `src/server/index.ts` was not modified. These observations support a provider/tool-confidence failure before or during tool dispatch; they do not justify a parent-side website repair.
+
+## Local-Qwen latency evidence (2026-08-25)
+The current Logs view records `[STDERR] ANALYZE: llm_call = 342247ms (baseline p95=11080ms, 2987% above)`. This is direct evidence of severe CPU-local latency during the bounded delegated task and is consistent with the still-running/thinking state and absence of a source write. The local model remains appropriate for short low-cost interactions but is not reliable for this tool-heavy website milestone on the current host.
