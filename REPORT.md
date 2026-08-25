@@ -260,3 +260,7 @@ After the targeted local-Qwen task remained active for more than 21 minutes with
 
 ## Post-safe-stop runtime health (2026-08-25)
 After stopping the stalled local Qwen server, the Agent Miki gateway and core remained healthy: dashboard HTTP returned 200, core `/health` returned `{"status":"ok","service":"core"}`, and the gateway/CLI processes remained active. No `llama-server` process remained. Independent website inspection still found zero PUT and zero DELETE routes. This cleanup preserved the runtime while preventing the unresponsive local model from consuming resources.
+
+
+## Fresh Logs cross-check (2026-08-25)
+The current dashboard Logs snapshot still contains no activity after the recorded local-Qwen safe-stop. The latest visible markers remain the earlier Qwen `llm_call = 342247ms` anomaly and tool-execution error-rate records; Runs also reports no agent runs. No new delegated source write or completion evidence is present.
