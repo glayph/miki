@@ -203,3 +203,6 @@ The latest ordinary-chat retry completed without any delegated source changes. I
 
 ## Post-detail route independent HTTP verification (2026-08-25)
 Agent Miki added `GET /api/posts/:id` to the coherent entrypoint and expanded the smoke test to include health and missing-post behavior. Independent built-server HTTP testing returned 200 for health, 201 for registration, 201 for post creation, 200 for the created post detail, and 404 with `Post not found` for a missing ID. The route is now verified, but update/delete/ownership enforcement, full frontend behavior, browser UI smoke checks, and packaging remain unfinished.
+
+## Latest post-detail validation checkpoint (2026-08-25)
+The coherent website source now contains `GET /api/posts/:id`; independent `npm run build` and `npm test` both pass, with two tests covering health and missing-post 404. The coherent entrypoint still lacks `PUT` and `DELETE` post routes and ownership tests, so full own-post CRUD and the final website package remain incomplete.
