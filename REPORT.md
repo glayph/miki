@@ -197,3 +197,6 @@ Remaining website limitations are not yet cleared: only the inspected backend ro
 
 ## Own-post CRUD delegation audit (2026-08-25)
 The ordinary-chat CRUD milestone produced no file changes after submission. The coherent `src/server/index.ts` still exposes only `GET /api/posts` and `POST /api/posts`; its corresponding `src/server/db.ts` has update/delete helpers but they are not wired into that entrypoint, and the only test remains a one-assertion sanity smoke test. A separate legacy `server/index.ts` contains detail/update/delete routes, but it is not the declared `npm start` entrypoint and uses a different database layout, so it cannot count as verified functionality. The delegated website remains incomplete and must not be packaged.
+
+## Latest own-post CRUD retry audit (2026-08-25)
+The latest ordinary-chat retry completed without any delegated source changes. Independent route inspection still finds only `GET /api/posts` and `POST /api/posts` in the coherent `src/server/index.ts`; detail, update, delete, and ownership-enforcement routes remain absent there. `tests/smoke.test.ts` is still only a seven-line sanity test. The legacy `server/index.ts` continues to contain a separate, unverified CRUD implementation and is not the declared runtime entrypoint. No website ZIP is authorized.
