@@ -264,3 +264,7 @@ After stopping the stalled local Qwen server, the Agent Miki gateway and core re
 
 ## Fresh Logs cross-check (2026-08-25)
 The current dashboard Logs snapshot still contains no activity after the recorded local-Qwen safe-stop. The latest visible markers remain the earlier Qwen `llm_call = 342247ms` anomaly and tool-execution error-rate records; Runs also reports no agent runs. No new delegated source write or completion evidence is present.
+
+
+## Runs-view monitoring checkpoint (2026-08-25)
+The existing Agent Miki Runs view was checked again after the latest safe-stopped PUT retry and still displayed `No agent runs recorded`. No new delegated run, tool execution, source write, or completion evidence was visible.
