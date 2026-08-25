@@ -284,3 +284,11 @@ During the bounded retry, the local `llama-server` process was observed running 
 ## Current repository and automation recheck (2026-08-25)
 
 Canonical HEAD remains `c5aedf5`, the latest GitHub Actions run for that revision completed successfully, core health is OK, and the single recurring continuation schedule remains active at 10,800 seconds with `runAsNewTask=false`. Repository status still contains only the intentionally untracked `authenticated-blog-app/` and `workflow.json`; neither is staged or included in canonical runtime commits.
+
+## Finalization retry: stale landing-page response (2026-08-25)
+
+The next ordinary-chat delegation was sent through the existing same-context dashboard using `gemini/gemini-3.5-flash-lite`, with narrowly scoped owner PUT/DELETE milestones and explicit instructions not to use Goal controls or the legacy server tree. Agent Miki responded that it had completed and verified only `index.html` landing-page files and reported a provider warning; it did not provide evidence for the requested API milestones.
+
+Independent inspection immediately after the response found `authenticated-blog-app/src/server/index.ts` unchanged at its prior mtime, with zero PUT and zero DELETE route declarations. The website test suite remains 3 passing and 2 failing: owner update expected 200 but received 404, and unauthenticated update expected 401 but received 404. This is a stale/out-of-scope delegated response with no backend implementation evidence. The parent agent did not edit the website source. Final packaging remains blocked until the coherent backend, complete frontend, browser validation, security review, documentation, and clean-install evidence all pass.
+
+The same baseline check found the existing three-hour continuation schedule had become paused even though it was expected to remain active. The existing schedule was re-enabled without creating, duplicating, deleting, or converting it; it now reports one active schedule, interval 10,800 seconds, and `runAsNewTask=false`. Core health remained OK throughout.
