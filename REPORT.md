@@ -257,3 +257,6 @@ A final narrowly constrained request asked local Qwen to use a targeted edit rat
 
 ## Local-Qwen safe-stop result (2026-08-25)
 After the targeted local-Qwen task remained active for more than 21 minutes without changing `src/server/index.ts`, the stalled `llama-server` process was stopped safely. The dashboard then reported: `Provider llama.cpp request failed. Connection error. (60bde245-ca09-4888-9c5e-f8cef46cf534) The run was stopped safely.` Independent checks still show zero PUT and zero DELETE routes and 3 passing / 2 failing website tests. Cause: the CPU-local provider process became unresponsive during the tool-heavy loop. Impact: the delegated backend milestone remains blocked; enabling change would require a more reliable provider/runtime or substantially smaller bounded workflow. No parent-side website implementation was performed.
+
+## Post-safe-stop runtime health (2026-08-25)
+After stopping the stalled local Qwen server, the Agent Miki gateway and core remained healthy: dashboard HTTP returned 200, core `/health` returned `{"status":"ok","service":"core"}`, and the gateway/CLI processes remained active. No `llama-server` process remained. Independent website inspection still found zero PUT and zero DELETE routes. This cleanup preserved the runtime while preventing the unresponsive local model from consuming resources.
