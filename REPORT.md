@@ -314,3 +314,7 @@ Without sending another prompt, the existing dashboard was checked after the use
 ## Post-correction Inspector result (2026-08-25)
 
 After the single evidence-based correction message, Agent Miki returned to `Ready` with `File Read — Completed` as the only visible live activity and repeated the stale `index.html` landing-page completion output. No new File Write, test, build, PUT route, or DELETE route evidence appeared. Independent checks immediately before this refresh still showed `src/server/index.ts` unchanged with zero PUT/DELETE declarations and core health OK. Per the minimal-communication rule, no second corrective prompt was sent for the same failure.
+
+## Conditional-monitoring schedule correction (2026-08-25)
+
+A quiet status check detected that the existing 10,800-second same-context continuation schedule had become paused again. No duplicate schedule was created and no task context was changed; the existing schedule was re-enabled in place. Follow-up status reports one active schedule with `runAsNewTask=false`. This operational correction was made because the schedule state contradicted the standing continuation requirement; it is unrelated to the incomplete delegated website implementation.
