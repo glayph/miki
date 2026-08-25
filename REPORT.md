@@ -268,3 +268,7 @@ The current dashboard Logs snapshot still contains no activity after the recorde
 
 ## Runs-view monitoring checkpoint (2026-08-25)
 The existing Agent Miki Runs view was checked again after the latest safe-stopped PUT retry and still displayed `No agent runs recorded`. No new delegated run, tool execution, source write, or completion evidence was visible.
+
+
+## Health-page monitoring checkpoint (2026-08-25)
+The dashboard Health page remains operational but reports overall `degraded` because Doctor is `warn` and Secret findings is `degraded` with 23 possible matches across runtime/config backups, test fixtures, and the untracked delegated website's legacy `server/index.ts`. Core API, Agent Flow, gateway, auth/session guard, memory, model provider, tools, queue, and watchdog components are healthy; no runtime jobs are stalled. The scan result is evidence for follow-up security review, not proof that any value is an active credential. No secret values were copied into this report and no website source was modified by the parent.
