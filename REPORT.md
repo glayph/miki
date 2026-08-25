@@ -306,3 +306,11 @@ Independent filesystem inspection confirms the mismatch: `src/server/index.ts` r
 ## Quiet Inspector shell-completion cross-check (2026-08-25)
 
 A later dashboard refresh showed `Shell Execute — Completed` in Live activity while the run remained active. Independent inspection immediately afterward found the coherent `src/server/index.ts` mtime unchanged, zero PUT/DELETE route declarations, and the same 3-passing/2-failing test state. The completed shell activity therefore did not demonstrate the requested backend implementation; the visible output still concerned only the landing page and provider/runtime status. No additional ordinary-chat prompt was sent during this check, in accordance with the minimal-communication rule.
+
+## Minimal-communication monitoring checkpoint (2026-08-25)
+
+Without sending another prompt, the existing dashboard was checked after the user requested that repetitive messages stop. Agent Miki had returned to `Ready` with `File Read — Completed` as the only visible live activity. The latest output again claimed completion of `index.html` landing-page files and did not show PUT/DELETE implementation, test, or build evidence. This reinforces the prior Inspector/filesystem mismatch; no website source was modified by the parent and no duplicate delegation was issued.
+
+## Post-correction Inspector result (2026-08-25)
+
+After the single evidence-based correction message, Agent Miki returned to `Ready` with `File Read — Completed` as the only visible live activity and repeated the stale `index.html` landing-page completion output. No new File Write, test, build, PUT route, or DELETE route evidence appeared. Independent checks immediately before this refresh still showed `src/server/index.ts` unchanged with zero PUT/DELETE declarations and core health OK. Per the minimal-communication rule, no second corrective prompt was sent for the same failure.
