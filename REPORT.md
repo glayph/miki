@@ -215,3 +215,6 @@ The next ordinary-chat request produced no delegated file changes after the prio
 
 ## Owner-authenticated DELETE delegation failure (2026-08-25)
 The latest ordinary-chat DELETE milestone produced no delegated source changes. The coherent `src/server/index.ts` still contains only `GET /api/posts`, `GET /api/posts/:id`, and `POST /api/posts`; no `DELETE` route or ownership check was added. Independent build exits 0, but the five-test Jest suite exits 1: owner update receives 404 instead of 200 and unauthenticated update receives 404 instead of 401. The result is documented as an incomplete delegation, with no website packaging.
+
+## Final DELETE-route audit checkpoint (2026-08-25)
+After the latest ordinary-chat attempt, no delegated files changed. The coherent `src/server/index.ts` still exposes only list, detail, and create post routes. Independent `npm run build` exits 0, but `npm test` exits 1 with 3 passing and 2 failing tests: owner update returns 404 instead of 200, and unauthenticated update returns 404 instead of 401. DELETE behavior is therefore unimplemented and no final website ZIP is produced.
