@@ -296,3 +296,9 @@ The same baseline check found the existing three-hour continuation schedule had 
 ## Finalization provider availability retry (2026-08-25)
 
 The finalization sequence first selected `gemini/gemini-3.5-flash-lite`; Agent Miki performed only a File Read and returned a stale landing-page completion message, followed by a provider warning. Independent inspection found no coherent backend source change. A subsequent same-context retry with `gemini/gemini-3.6-flash` was immediately rejected with `The service is temporarily busy or rate-limited. Please try again shortly.` No website files changed and no PUT/DELETE implementation evidence exists. These are fresh provider-availability limitations; the parent agent continues not to author the delegated website. Further retries must remain narrowly scoped and ordinary-chat-only, with independent filesystem verification.
+
+## Inspector live-work versus output cross-check (2026-08-25)
+
+The live dashboard was checked to compare Agent Miki's visible output with Inspector activity. Inspector showed only `File Read — Completed`; there was no visible File Write, test, build, or backend-edit activity. The text output claimed completion of the required landing-page file `index.html`, while the requested PUT/DELETE milestone was either not executed or not evidenced.
+
+Independent filesystem inspection confirms the mismatch: `src/server/index.ts` retains its prior mtime and contains only health, auth, list, detail, and create routes; it has zero PUT and zero DELETE declarations. `tests/smoke.test.ts` is newer but `npm test -- --runInBand` still reports 3 passing and 2 failing, with owner update receiving 404 instead of 200 and unauthenticated update receiving 404 instead of 401. Therefore Inspector's live evidence does not support a claim that the backend milestone was completed. No parent-side website source edit was made.
