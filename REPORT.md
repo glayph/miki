@@ -230,3 +230,6 @@ Canonical tracked revision remains `adf2e66`; the only untracked paths are the i
 
 ## Latest DELETE-route retry audit (2026-08-25)
 No delegated website files changed after 04:03. The coherent `src/server/index.ts` still contains only `GET /api/posts`, `GET /api/posts/:id`, and `POST /api/posts`; PUT and DELETE remain absent. The existing independent Jest log still reports 3 passing and 2 failing tests: authenticated update expected 200 but received 404, and unauthenticated update expected 401 but received 404. The website remains incomplete; no ZIP is packaged.
+
+## Scoped PUT-route delegation rate-limit (2026-08-25)
+A narrowly scoped ordinary-chat request to implement `PUT /api/posts/:id` in the coherent delegated entrypoint was submitted in the same dashboard context. Agent Miki returned: “The service is temporarily busy or rate-limited. Please try again shortly.” The request produced no source changes: `src/server/index.ts` still has no PUT or DELETE route, and the existing independent Jest state remains 3 passing / 2 failing. Cause is provider/service availability or rate limiting, not a verified website implementation defect. Impact is that the remaining backend CRUD milestone cannot yet be delegated or validated. Enabling change: retry later with the same context and one narrowly scoped task; do not substitute parent-authored website code.
