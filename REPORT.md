@@ -236,3 +236,6 @@ A narrowly scoped ordinary-chat request to implement `PUT /api/posts/:id` in the
 
 ## Second scoped PUT-route retry also rate-limited (2026-08-25)
 After waiting and retrying the same-context ordinary-chat milestone, Agent Miki again returned: “The service is temporarily busy or rate-limited. Please try again shortly.” The dashboard showed the request and then returned Ready with no implementation evidence. Independent file inspection confirms no PUT or DELETE route was added to `src/server/index.ts`. This is a repeated provider availability limitation; the website remains at 3 passing / 2 failing tests and is not eligible for packaging.
+
+## Flash Lite retry audit (2026-08-25)
+The selected `gemini/gemini-3.5-flash-lite` retry completed without a new provider error, but it performed only a read-only inspection and made no source change. Independent inspection showed `src/server/index.ts` unchanged with no PUT or DELETE route. `npm test -- --runInBand` remains 3 passing and 2 failing: owner update expected 200 but received 404, and unauthenticated update expected 401 but received 404; the missing-post 404 checks pass. The backend CRUD milestone therefore remains incomplete and no ZIP is eligible.
