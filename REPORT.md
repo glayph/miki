@@ -251,3 +251,6 @@ The refreshed Logs view shows the delegated Flash Lite execution emitted both `[
 
 ## Local-Qwen latency evidence (2026-08-25)
 The current Logs view records `[STDERR] ANALYZE: llm_call = 342247ms (baseline p95=11080ms, 2987% above)`. This is direct evidence of severe CPU-local latency during the bounded delegated task and is consistent with the still-running/thinking state and absence of a source write. The local model remains appropriate for short low-cost interactions but is not reliable for this tool-heavy website milestone on the current host.
+
+## Targeted local-Qwen retry audit (2026-08-25)
+A final narrowly constrained request asked local Qwen to use a targeted edit rather than a full-file write. The dashboard remained in a thinking state and then no coherent implementation evidence appeared. Independent inspection found `src/server/index.ts` unchanged, with zero PUT and zero DELETE route declarations. `npm test -- --runInBand` again reported 3 passing and 2 failing: owner update expected 200 but received 404, and unauthenticated update expected 401 but received 404. This retry did not overcome the local tool-loop limitation; the delegated website remains incomplete and no ZIP is packaged.
