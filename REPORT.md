@@ -272,3 +272,15 @@ The existing Agent Miki Runs view was checked again after the latest safe-stoppe
 
 ## Health-page monitoring checkpoint (2026-08-25)
 The dashboard Health page remains operational but reports overall `degraded` because Doctor is `warn` and Secret findings is `degraded` with 23 possible matches across runtime/config backups, test fixtures, and the untracked delegated website's legacy `server/index.ts`. Core API, Agent Flow, gateway, auth/session guard, memory, model provider, tools, queue, and watchdog components are healthy; no runtime jobs are stalled. The scan result is evidence for follow-up security review, not proof that any value is an active credential. No secret values were copied into this report and no website source was modified by the parent.
+
+## Current same-context PUT retry audit (2026-08-25)
+
+A new narrowly scoped ordinary-chat instruction was sent to Agent Miki in the existing dashboard conversation, asking it to implement only the coherent `authenticated-blog-app/src/server/index.ts` `PUT /api/posts/:id` route using the existing repository and session patterns. The dashboard showed `Running` with one active agent, but after bounded observation the source mtime remained unchanged and independent route inspection still found zero `PUT` and zero `DELETE` declarations. The delegated run produced no filesystem completion evidence.
+
+The existing website validation remains reproducibly incomplete: `npm test -- --runInBand` reports 3 passing and 2 failing tests, with owner update expected 200 but receiving 404 and unauthenticated update expected 401 but receiving 404. The coherent website entrypoint therefore still lacks update/delete behavior; the legacy duplicate `server/index.ts` remains excluded from validation. No website source was authored or repaired by the parent agent, and no ZIP is packaged.
+
+During the bounded retry, the local `llama-server` process was observed running while the dashboard remained in `Running` state and the coherent website file stayed unchanged. After the established bounded-stall threshold, only the matching Qwen `llama-server` process was terminated; the gateway and core processes were preserved, and core `/health` immediately returned `{"status":"ok","service":"core"}`. This is fresh evidence of the previously documented CPU-local tool-loop limitation, not a website implementation success. The enabling change still required is reliable bounded tool execution through a working provider/runtime; the next website milestone must remain delegated through ordinary chat only.
+
+## Current repository and automation recheck (2026-08-25)
+
+Canonical HEAD remains `c5aedf5`, the latest GitHub Actions run for that revision completed successfully, core health is OK, and the single recurring continuation schedule remains active at 10,800 seconds with `runAsNewTask=false`. Repository status still contains only the intentionally untracked `authenticated-blog-app/` and `workflow.json`; neither is staged or included in canonical runtime commits.
